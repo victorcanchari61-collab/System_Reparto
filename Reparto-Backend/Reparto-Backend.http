@@ -1,0 +1,6 @@
+@Reparto_Backend_HostAddress = http://localhost:5248
+
+GET {{Reparto_Backend_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
