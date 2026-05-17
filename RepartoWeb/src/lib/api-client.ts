@@ -40,6 +40,11 @@ export const apiClient = {
     address: string;
     phone: string;
     companyEmail: string;
+    logo?: string;
+    sunatSolUser?: string;
+    sunatSolPassword?: string;
+    certBase64?: string;
+    certPassword?: string;
     adminFullName: string;
     adminEmail: string;
     adminPhone: string;
@@ -55,6 +60,11 @@ export const apiClient = {
         address: data.address,
         phone: data.phone,
         companyEmail: data.companyEmail,
+        logo: data.logo || null,
+        sunatSolUser: data.sunatSolUser || null,
+        sunatSolPassword: data.sunatSolPassword || null,
+        certBase64: data.certBase64 || null,
+        certPassword: data.certPassword || null,
         adminFullName: data.adminFullName,
         adminEmail: data.adminEmail,
         adminPhone: data.adminPhone,

@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Reparto-Backend")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+8bd6de26c73a13e6016e00ff74283729131e716c")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+e133fdc8d0facba7aff9a50320faa217184ec929")]
 [assembly: System.Reflection.AssemblyProductAttribute("Reparto-Backend")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Reparto-Backend")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

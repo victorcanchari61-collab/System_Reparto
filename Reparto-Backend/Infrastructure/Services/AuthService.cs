@@ -61,7 +61,10 @@ public sealed class AuthService : IAuthService
             TradeName = request.TradeName.Trim(),
             Address = request.Address.Trim(),
             Phone = request.Phone.Trim(),
-            Email = request.CompanyEmail.Trim()
+            Email = request.CompanyEmail.Trim(),
+            Logo = request.Logo?.Trim(),
+            SunatSolUser = request.SunatSolUser?.Trim(),
+            SunatSolPassword = request.SunatSolPassword?.Trim()
         };
 
         _dbContext.Companies.Add(company);

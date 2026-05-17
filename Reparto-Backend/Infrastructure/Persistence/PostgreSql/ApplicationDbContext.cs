@@ -35,6 +35,9 @@ public sealed class ApplicationDbContext(
             entity.Property(company => company.Address).HasMaxLength(300);
             entity.Property(company => company.Phone).HasMaxLength(30);
             entity.Property(company => company.Email).HasMaxLength(200);
+            entity.Property(company => company.Logo).HasMaxLength(500);
+            entity.Property(company => company.SunatSolUser).HasMaxLength(100);
+            entity.Property(company => company.SunatSolPassword).HasMaxLength(200);
         });
 
         modelBuilder.Entity<Permission>(entity =>

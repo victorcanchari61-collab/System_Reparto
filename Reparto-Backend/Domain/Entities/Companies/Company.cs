@@ -16,6 +16,12 @@ public sealed class Company
 
     public string Email { get; set; } = string.Empty;
 
+    public string? Logo { get; set; }
+
+    public string? SunatSolUser { get; set; }
+
+    public string? SunatSolPassword { get; set; }
+
     public bool IsActive { get; set; } = true;
 
     public DateTime CreatedAtUtc { get; set; } = DateTime.UtcNow;
