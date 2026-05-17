@@ -1,41 +1,41 @@
-var builder = WebApplication.CreateBuilder(args);
+using Reparto_Backend.Infrastructure.DependencyInjection;
+using Reparto_Backend.Application.Abstractions.Realtime;
+using Reparto_Backend.Presentation.Hubs;
 
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
-
-var app = builder.Build();
-
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+namespace Reparto_Backend.Presentation
 {
-    app.MapOpenApi();
-}
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            Console.WriteLine("¡Hola, mundo!");
+            
+            var builder = WebApplication.CreateBuilder(args);
 
-app.UseHttpsRedirection();
+            builder.Services.AddOpenApi();
+            builder.Services.AddSignalR();
+            builder.Services.AddScoped<IRealtimeNotifier, SignalRRealtimeNotifier>();
+            builder.Services.AddInfrastructure(builder.Configuration);
 
-var summaries = new[]
-{
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
+            var app = builder.Build();
 
-app.MapGet("/weatherforecast", () =>
-{
-    var forecast =  Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
-})
-.WithName("GetWeatherForecast");
+            if (app.Environment.IsDevelopment())
+            {
+                app.MapOpenApi();
+            }
 
-app.Run();
+            app.UseHttpsRedirection();
+            app.UseWebSockets();
 
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
+            app.MapGet("/", () => Results.Ok(new
+            {
+                Service = "Reparto Backend",
+                Status = "Running"
+            }));
+
+            app.MapHub<DeliveryTrackingHub>("/hubs/delivery-tracking");
+
+            app.Run();
+        }
+    }
 }
