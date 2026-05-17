@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Reparto_Backend.Application.Abstractions.Auth;
 using Reparto_Backend.Application.Authorization;
 using Reparto_Backend.Domain.Entities.Companies;
 using Reparto_Backend.Domain.Entities.Permissions;
@@ -8,7 +9,9 @@ using Reparto_Backend.Infrastructure.Persistence.PostgreSql.Tokens;
 
 namespace Reparto_Backend.Infrastructure.Persistence.PostgreSql;
 
-public sealed class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
+public sealed class ApplicationDbContext(
+    DbContextOptions<ApplicationDbContext> options,
+    ITenantProvider tenantProvider)
     : IdentityDbContext<ApplicationUser, ApplicationRole, Guid>(options)
 {
     public DbSet<Company> Companies => Set<Company>();
@@ -55,6 +58,7 @@ public sealed class ApplicationDbContext(DbContextOptions<ApplicationDbContext> 
                 .WithMany()
                 .HasForeignKey(user => user.CompanyId)
                 .OnDelete(DeleteBehavior.Restrict);
+            entity.HasQueryFilter(user => user.CompanyId == tenantProvider.TenantId);
         });
 
         modelBuilder.Entity<ApplicationRole>(entity =>
@@ -69,6 +73,7 @@ public sealed class ApplicationDbContext(DbContextOptions<ApplicationDbContext> 
                 .WithMany()
                 .HasForeignKey(role => role.CompanyId)
                 .OnDelete(DeleteBehavior.Restrict);
+            entity.HasQueryFilter(role => role.CompanyId == tenantProvider.TenantId || role.CompanyId == null);
         });
 
         modelBuilder.Entity<RefreshToken>(entity =>

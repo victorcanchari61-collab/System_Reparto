@@ -8,6 +8,7 @@ using Reparto_Backend.Application.Abstractions.Auth;
 using Reparto_Backend.Application.Authorization;
 using Reparto_Backend.Infrastructure.Auth;
 using Reparto_Backend.Infrastructure.Options;
+using Reparto_Backend.Infrastructure.Services;
 using Reparto_Backend.Infrastructure.Persistence.PostgreSql.Identity;
 using Reparto_Backend.Infrastructure.Persistence.PostgreSql;
 using StackExchange.Redis;
@@ -26,8 +27,11 @@ public static class InfrastructureServiceCollectionExtensions
         services.AddMongoDb(configuration);
         services.AddRedis(configuration);
         services.AddExternalServicesOptions(configuration);
+        services.AddHttpContextAccessor();
         services.AddScoped<IJwtTokenService, JwtTokenService>();
         services.AddSingleton<IRefreshTokenService, RefreshTokenService>();
+        services.AddScoped<ITenantProvider, TenantProvider>();
+        services.AddScoped<IAuthService, AuthService>();
 
         return services;
     }
@@ -83,7 +87,11 @@ public static class InfrastructureServiceCollectionExtensions
         var signingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.SecretKey));
 
         services
-            .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            .AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
             .AddJwtBearer(options =>
             {
                 options.TokenValidationParameters = new TokenValidationParameters
