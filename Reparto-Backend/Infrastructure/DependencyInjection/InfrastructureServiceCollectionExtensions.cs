@@ -1,6 +1,14 @@
+using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using MongoDB.Driver;
+using Reparto_Backend.Application.Abstractions.Auth;
+using Reparto_Backend.Application.Authorization;
+using Reparto_Backend.Infrastructure.Auth;
 using Reparto_Backend.Infrastructure.Options;
+using Reparto_Backend.Infrastructure.Persistence.PostgreSql.Identity;
 using Reparto_Backend.Infrastructure.Persistence.PostgreSql;
 using StackExchange.Redis;
 
@@ -13,9 +21,13 @@ public static class InfrastructureServiceCollectionExtensions
         IConfiguration configuration)
     {
         services.AddPostgreSql(configuration);
+        services.AddIdentityCore();
+        services.AddJwtAuthentication(configuration);
         services.AddMongoDb(configuration);
         services.AddRedis(configuration);
         services.AddExternalServicesOptions(configuration);
+        services.AddScoped<IJwtTokenService, JwtTokenService>();
+        services.AddSingleton<IRefreshTokenService, RefreshTokenService>();
 
         return services;
     }
@@ -33,6 +45,68 @@ public static class InfrastructureServiceCollectionExtensions
 
         services.AddDbContext<ApplicationDbContext>(options =>
             options.UseNpgsql(connectionString));
+
+        return services;
+    }
+
+    private static IServiceCollection AddIdentityCore(this IServiceCollection services)
+    {
+        services
+            .AddIdentity<ApplicationUser, ApplicationRole>(options =>
+            {
+                options.User.RequireUniqueEmail = true;
+                options.Password.RequiredLength = 8;
+                options.Password.RequireDigit = true;
+                options.Password.RequireLowercase = true;
+                options.Password.RequireUppercase = false;
+                options.Password.RequireNonAlphanumeric = false;
+            })
+            .AddEntityFrameworkStores<ApplicationDbContext>()
+            .AddDefaultTokenProviders();
+
+        return services;
+    }
+
+    private static IServiceCollection AddJwtAuthentication(
+        this IServiceCollection services,
+        IConfiguration configuration)
+    {
+        services
+            .AddOptions<JwtOptions>()
+            .Bind(configuration.GetSection(JwtOptions.SectionName))
+            .Validate(options => !string.IsNullOrWhiteSpace(options.Issuer), "JWT issuer is required.")
+            .Validate(options => !string.IsNullOrWhiteSpace(options.Audience), "JWT audience is required.")
+            .Validate(options => options.SecretKey.Length >= 32, "JWT secret key must have at least 32 characters.");
+
+        var jwtOptions = configuration.GetSection(JwtOptions.SectionName).Get<JwtOptions>()
+            ?? throw new InvalidOperationException("JWT options are not configured.");
+        var signingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.SecretKey));
+
+        services
+            .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            .AddJwtBearer(options =>
+            {
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidIssuer = jwtOptions.Issuer,
+                    ValidateAudience = true,
+                    ValidAudience = jwtOptions.Audience,
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = signingKey,
+                    ValidateLifetime = true,
+                    ClockSkew = TimeSpan.FromMinutes(1)
+                };
+            });
+
+        services.AddAuthorizationBuilder()
+            .AddPolicy("authenticated", policy => policy.RequireAuthenticatedUser());
+
+        foreach (var permission in SystemPermissions.All)
+        {
+            services.AddAuthorizationBuilder()
+                .AddPolicy(permission, policy => policy.RequireClaim(PermissionClaimTypes.Permission, permission));
+        }
 
         return services;
     }
