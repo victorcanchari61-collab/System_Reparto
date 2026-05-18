@@ -1,36 +1,47 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
+using Reparto_Backend.Application.Authorization;
+using System.Security.Claims;
 
 namespace Reparto_Backend.Presentation.Hubs;
 
+[Authorize]
 public sealed class DeliveryTrackingHub : Hub
 {
-    public async Task JoinOrderTrackingAsync(Guid orderId)
+    // ── Grupos de empresa ─────────────────────────────────────
+
+    /// <summary>
+    /// El cliente se une al grupo de su empresa al conectar.
+    /// Recibe todos los eventos company-scoped (stock, módulos, pedidos).
+    /// </summary>
+    public override async Task OnConnectedAsync()
     {
-        await Groups.AddToGroupAsync(Context.ConnectionId, GetOrderGroupName(orderId));
+        var companyId = Context.User?.FindFirstValue(PermissionClaimTypes.CompanyId);
+        if (!string.IsNullOrEmpty(companyId))
+            await Groups.AddToGroupAsync(Context.ConnectionId, GetCompanyGroupName(Guid.Parse(companyId)));
+
+        await base.OnConnectedAsync();
     }
+
+    // ── Tracking de pedidos ───────────────────────────────────
+
+    public async Task JoinOrderTrackingAsync(Guid orderId)
+        => await Groups.AddToGroupAsync(Context.ConnectionId, GetOrderGroupName(orderId));
 
     public async Task LeaveOrderTrackingAsync(Guid orderId)
-    {
-        await Groups.RemoveFromGroupAsync(Context.ConnectionId, GetOrderGroupName(orderId));
-    }
+        => await Groups.RemoveFromGroupAsync(Context.ConnectionId, GetOrderGroupName(orderId));
+
+    // ── Tracking de conductores ───────────────────────────────
 
     public async Task JoinCourierTrackingAsync(Guid courierId)
-    {
-        await Groups.AddToGroupAsync(Context.ConnectionId, GetCourierGroupName(courierId));
-    }
+        => await Groups.AddToGroupAsync(Context.ConnectionId, GetCourierGroupName(courierId));
 
     public async Task LeaveCourierTrackingAsync(Guid courierId)
-    {
-        await Groups.RemoveFromGroupAsync(Context.ConnectionId, GetCourierGroupName(courierId));
-    }
+        => await Groups.RemoveFromGroupAsync(Context.ConnectionId, GetCourierGroupName(courierId));
 
-    public static string GetOrderGroupName(Guid orderId)
-    {
-        return $"orders:{orderId}";
-    }
+    // ── Nombres de grupo (estáticos, usados por el notifier) ─
 
-    public static string GetCourierGroupName(Guid courierId)
-    {
-        return $"couriers:{courierId}";
-    }
+    public static string GetCompanyGroupName(Guid companyId) => $"company:{companyId}";
+    public static string GetOrderGroupName(Guid orderId)     => $"orders:{orderId}";
+    public static string GetCourierGroupName(Guid courierId) => $"couriers:{courierId}";
 }

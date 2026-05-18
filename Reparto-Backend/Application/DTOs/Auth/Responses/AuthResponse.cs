@@ -1,26 +1,4 @@
-namespace Reparto_Backend.Application.DTOs.Auth;
-
-public sealed record RegisterCompanyRequest(
-    string Ruc,
-    string BusinessName,
-    string TradeName,
-    string Address,
-    string Phone,
-    string CompanyEmail,
-    string? Logo,
-    string? SunatSolUser,
-    string? SunatSolPassword,
-    string AdminFullName,
-    string AdminEmail,
-    string AdminPhone,
-    string AdminPassword);
-
-public sealed record LoginRequest(
-    string Email,
-    string Password);
-
-public sealed record RefreshTokenRequest(
-    string RefreshToken);
+namespace Reparto_Backend.Application.DTOs.Auth.Responses;
 
 public sealed record AuthResponse(
     string AccessToken,
@@ -31,6 +9,10 @@ public sealed record AuthResponse(
     string FullName,
     string Email);
 
+/// <summary>
+/// Resultado interno del servicio de autenticación.
+/// Envuelve AuthResponse en caso de éxito o un mensaje de error.
+/// </summary>
 public sealed record AuthResult
 {
     public AuthResponse? Response { get; private init; }

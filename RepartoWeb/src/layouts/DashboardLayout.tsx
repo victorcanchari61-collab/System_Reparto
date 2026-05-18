@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/useAuthStore';
 import Topnav from './Topnav';
@@ -6,7 +6,9 @@ import Sidebar from './Sidebar';
 
 export const DashboardLayout: React.FC = () => {
   const { user } = useAuthStore();
-  const navigate = useNavigate();
+  const navigate  = useNavigate();
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
   useEffect(() => {
     if (!user) navigate('/login');
@@ -21,13 +23,16 @@ export const DashboardLayout: React.FC = () => {
   }
 
   return (
-    /* h-screen + overflow-hidden ancla la UI al viewport; min-h-0 en el hijo
-       permite que flex-1 shrinkee y el scroll funcione correctamente */
-    <div className="h-screen flex flex-col overflow-hidden bg-[#f9fafb]">
-      <Topnav />
-      <div className="flex flex-1 min-h-0">
-        <Sidebar />
-        <main className="flex-1 overflow-y-auto">
+    <div className="h-screen flex overflow-hidden">
+      <Sidebar
+        open={sidebarOpen}
+        onToggle={() => setSidebarOpen(v => !v)}
+        mobileOpen={mobileSidebarOpen}
+        onMobileClose={() => setMobileSidebarOpen(false)}
+      />
+      <div className="flex flex-col flex-1 min-w-0">
+        <Topnav onMobileMenuClick={() => setMobileSidebarOpen(true)} />
+        <main className="flex-1 overflow-y-auto bg-[#f9fafb]">
           <Outlet />
         </main>
       </div>

@@ -7,6 +7,14 @@ export interface Company {
   createdAtUtc: string;
 }
 
+export interface CompanyModule {
+  key: string;
+  label: string;
+  description: string;
+  isEnabled: boolean;
+  expiresAt: string | null;
+}
+
 export interface User {
   id: string;
   name: string;

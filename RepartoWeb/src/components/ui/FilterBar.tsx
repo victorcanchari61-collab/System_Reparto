@@ -53,15 +53,15 @@ const FilterBar: React.FC<FilterBarProps> = ({
     <div className="flex flex-col gap-2">
       {/* Fila principal */}
       <div className="flex flex-wrap items-center gap-2">
-        {/* Input búsqueda */}
-        <div className="relative flex items-center">
+        {/* Input búsqueda — full width on mobile */}
+        <div className="relative flex items-center flex-1 sm:flex-none">
           <IconSearch size={13} className="absolute left-2.5 text-gray-400 pointer-events-none" />
           <input
             type="search"
             value={local}
             onChange={e => setLocal(e.target.value)}
             placeholder={placeholder}
-            className="pl-8 pr-3 py-2 text-[12px] border border-[var(--color-border-secondary)] rounded-[var(--border-radius-md)] bg-white focus:outline-none focus:border-r transition-colors w-52 sm:w-64"
+            className="pl-8 pr-3 py-2 text-[12px] border border-[var(--color-border-secondary)] rounded-[var(--border-radius-md)] bg-white focus:outline-none focus:border-r transition-colors w-full sm:w-64"
           />
           {local && (
             <button

@@ -187,6 +187,37 @@ namespace Reparto_Backend.Infrastructure.Persistence.PostgreSql.Migrations
                     b.ToTable("companies", (string)null);
                 });
 
+            modelBuilder.Entity("Reparto_Backend.Domain.Entities.Companies.CompanyModule", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("CompanyId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("ExpiresAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsEnabled")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("ModuleKey")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CompanyId", "ModuleKey")
+                        .IsUnique();
+
+                    b.ToTable("company_modules", (string)null);
+                });
+
             modelBuilder.Entity("Reparto_Backend.Domain.Entities.Permissions.Permission", b =>
                 {
                     b.Property<Guid>("Id")
@@ -589,6 +620,17 @@ namespace Reparto_Backend.Infrastructure.Persistence.PostgreSql.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Reparto_Backend.Domain.Entities.Companies.CompanyModule", b =>
+                {
+                    b.HasOne("Reparto_Backend.Domain.Entities.Companies.Company", "Company")
+                        .WithMany("Modules")
+                        .HasForeignKey("CompanyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Company");
+                });
+
             modelBuilder.Entity("Reparto_Backend.Infrastructure.Persistence.PostgreSql.Identity.ApplicationRole", b =>
                 {
                     b.HasOne("Reparto_Backend.Domain.Entities.Companies.Company", "Company")
@@ -619,6 +661,11 @@ namespace Reparto_Backend.Infrastructure.Persistence.PostgreSql.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Reparto_Backend.Domain.Entities.Companies.Company", b =>
+                {
+                    b.Navigation("Modules");
                 });
 
             modelBuilder.Entity("Reparto_Backend.Infrastructure.Persistence.PostgreSql.Identity.ApplicationUser", b =>

@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Reparto_Backend.Application.Abstractions.Auth;
 using Reparto_Backend.Application.Authorization;
-using Reparto_Backend.Application.DTOs.Auth;
+using Reparto_Backend.Application.DTOs.Auth.Requests;
 
 namespace Reparto_Backend.Presentation.Controllers;
 
@@ -59,11 +59,11 @@ public class AuthController : ControllerBase
     {
         return Ok(new
         {
-            UserId = User.FindFirstValue(ClaimTypes.NameIdentifier),
+            UserId    = User.FindFirstValue(ClaimTypes.NameIdentifier),
             CompanyId = User.FindFirstValue(PermissionClaimTypes.CompanyId),
-            Email = User.FindFirstValue(ClaimTypes.Email),
-            FullName = User.FindFirstValue(ClaimTypes.Name),
-            Roles = User.FindAll(ClaimTypes.Role).Select(c => c.Value).Distinct(),
+            Email     = User.FindFirstValue(ClaimTypes.Email),
+            FullName  = User.FindFirstValue(ClaimTypes.Name),
+            Roles       = User.FindAll(ClaimTypes.Role).Select(c => c.Value).Distinct(),
             Permissions = User.FindAll(PermissionClaimTypes.Permission).Select(c => c.Value).Distinct()
         });
     }

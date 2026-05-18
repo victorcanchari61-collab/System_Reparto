@@ -1,4 +1,5 @@
-using Reparto_Backend.Application.DTOs.Auth;
+using Reparto_Backend.Application.DTOs.Auth.Requests;
+using Reparto_Backend.Application.DTOs.Auth.Responses;
 
 namespace Reparto_Backend.Application.Abstractions.Auth;
 

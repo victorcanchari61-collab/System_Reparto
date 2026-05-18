@@ -14,15 +14,26 @@ public sealed class ApplicationDbContext(
     ITenantProvider tenantProvider)
     : IdentityDbContext<ApplicationUser, ApplicationRole, Guid>(options)
 {
-    public DbSet<Company> Companies => Set<Company>();
-
-    public DbSet<Permission> Permissions => Set<Permission>();
-
-    public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
+    public DbSet<Company>       Companies      => Set<Company>();
+    public DbSet<CompanyModule> CompanyModules => Set<CompanyModule>();
+    public DbSet<Permission>    Permissions    => Set<Permission>();
+    public DbSet<RefreshToken>  RefreshTokens  => Set<RefreshToken>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+
+        modelBuilder.Entity<CompanyModule>(entity =>
+        {
+            entity.ToTable("company_modules");
+            entity.HasKey(m => m.Id);
+            entity.HasIndex(m => new { m.CompanyId, m.ModuleKey }).IsUnique();
+            entity.Property(m => m.ModuleKey).HasMaxLength(50).IsRequired();
+            entity.HasOne(m => m.Company)
+                .WithMany(c => c.Modules)
+                .HasForeignKey(m => m.CompanyId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
 
         modelBuilder.Entity<Company>(entity =>
         {

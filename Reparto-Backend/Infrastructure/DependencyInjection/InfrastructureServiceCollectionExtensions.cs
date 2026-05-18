@@ -105,6 +105,22 @@ public static class InfrastructureServiceCollectionExtensions
                     ValidateLifetime = true,
                     ClockSkew = TimeSpan.FromMinutes(1)
                 };
+
+                // SignalR/WebSocket: el handshake no puede enviar headers,
+                // por eso el cliente manda el token como query string ?access_token=...
+                options.Events = new JwtBearerEvents
+                {
+                    OnMessageReceived = context =>
+                    {
+                        var token = context.Request.Query["access_token"];
+                        if (!string.IsNullOrEmpty(token) &&
+                            context.HttpContext.Request.Path.StartsWithSegments("/hubs"))
+                        {
+                            context.Token = token;
+                        }
+                        return Task.CompletedTask;
+                    }
+                };
             });
 
         services.AddAuthorizationBuilder()

@@ -88,7 +88,8 @@ const Modal: React.FC<ModalProps> = ({
       role="dialog"
       aria-modal
       aria-label={title}
-      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      /* Mobile: slide up from bottom (items-end). sm+: center */
+      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-4"
     >
       {/* Backdrop */}
       <div
@@ -100,7 +101,11 @@ const Modal: React.FC<ModalProps> = ({
       <div
         ref={panelRef}
         className={[
-          'relative w-full bg-white rounded-[var(--border-radius-lg)] shadow-xl flex flex-col max-h-[90vh] animate-modal-panel',
+          'relative w-full bg-white shadow-xl flex flex-col animate-modal-panel',
+          /* Mobile: bottom-sheet style — full width, rounded top, near-full height */
+          'max-h-[92vh] rounded-t-2xl',
+          /* sm+: centered card style */
+          'sm:max-h-[90vh] sm:rounded-[var(--border-radius-lg)]',
           sizeClass[size],
         ].join(' ')}
       >

@@ -166,6 +166,36 @@ export const apiClient = {
     throw new Error('Sesión no válida o sin token de autorización.');
   },
 
+  getCompany: async (id: string) => {
+    const response = await fetch(`${BACKEND_URL}/companies/${id}`, {
+      headers: getHeaders(),
+    });
+    if (!response.ok) throw new Error('Error al obtener la empresa.');
+    return await response.json();
+  },
+
+  updateCompany: async (id: string, data: {
+    businessName: string; tradeName?: string; address: string;
+    phone: string; companyEmail: string; logo?: string;
+    sunatSolUser?: string; sunatSolPassword?: string;
+  }) => {
+    const response = await fetch(`${BACKEND_URL}/companies/${id}`, {
+      method: 'PUT',
+      headers: getHeaders(),
+      body: JSON.stringify(data),
+    });
+    if (!response.ok) throw new Error('Error al actualizar la empresa.');
+  },
+
+  toggleCompanyStatus: async (id: string): Promise<{ id: string; isActive: boolean }> => {
+    const response = await fetch(`${BACKEND_URL}/companies/${id}/status`, {
+      method: 'PATCH',
+      headers: getHeaders(),
+    });
+    if (!response.ok) throw new Error('Error al cambiar el estado.');
+    return await response.json();
+  },
+
   getCompanies: async () => {
     const response = await fetch(`${BACKEND_URL}/companies`, {
       method: 'GET',
@@ -173,6 +203,24 @@ export const apiClient = {
     });
     if (!response.ok) throw new Error('Error al obtener las empresas.');
     return await response.json();
+  },
+
+  getCompanyModules: async (companyId: string) => {
+    const response = await fetch(`${BACKEND_URL}/companies/${companyId}/modules`, {
+      method: 'GET',
+      headers: getHeaders(),
+    });
+    if (!response.ok) throw new Error('Error al obtener los módulos.');
+    return await response.json();
+  },
+
+  updateCompanyModules: async (companyId: string, modules: { key: string; isEnabled: boolean }[]) => {
+    const response = await fetch(`${BACKEND_URL}/companies/${companyId}/modules`, {
+      method: 'PUT',
+      headers: getHeaders(),
+      body: JSON.stringify({ modules }),
+    });
+    if (!response.ok) throw new Error('Error al actualizar los módulos.');
   },
 
   toggleUserStatus: async (userId: string): Promise<boolean> => {

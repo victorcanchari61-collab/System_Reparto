@@ -15,6 +15,15 @@ export interface ColumnDef<T = any> {
   /** Render personalizado. Si no se provee, se muestra row[key] */
   render?: (row: T, index: number) => React.ReactNode;
   className?: string;
+  /** Comportamiento en la vista de cards (mobile) */
+  mobileCard?: {
+    /** Ocultar esta columna en la vista de cards */
+    hidden?: boolean;
+    /** Renderizar sin etiqueta, a ancho completo (columna "título" de la card) */
+    fullWidth?: boolean;
+    /** Renderizar en el pie de la card (botones de acción) */
+    isActions?: boolean;
+  };
 }
 
 interface DataTableProps<T = any> {
@@ -149,8 +158,8 @@ function DataTable<T extends Record<string, any>>({
   return (
     <div className="flex flex-col gap-2">
 
-      {/* Barra de herramientas de la tabla */}
-      <div className="flex justify-end">
+      {/* Barra de herramientas — oculta en mobile */}
+      <div className="hidden md:flex justify-end">
         <div className="relative" ref={mgrRef}>
           <button
             onClick={() => setMgr(v => !v)}
@@ -196,8 +205,91 @@ function DataTable<T extends Record<string, any>>({
         </div>
       </div>
 
-      {/* Tabla responsive */}
-      <div className="border border-[var(--color-border-secondary)] rounded-[var(--border-radius-lg)] overflow-hidden">
+      {/* ── Vista de cards — solo mobile ── */}
+      <div className="md:hidden flex flex-col gap-3">
+        {/* Skeleton */}
+        {loading && Array.from({ length: skeletonRows }).map((_, i) => (
+          <div key={i} className="bg-white border border-[var(--color-border-secondary)] rounded-[var(--border-radius-lg)] p-4 flex flex-col gap-3">
+            <div className="h-4 rounded shimmer w-2/3" />
+            <div className="h-3 rounded shimmer w-1/2" />
+            <div className="h-3 rounded shimmer w-3/4" />
+          </div>
+        ))}
+
+        {/* Sin datos */}
+        {!loading && sortedData.length === 0 && (
+          <div className="py-14 text-center text-[13px] text-gray-400">
+            <div className="flex flex-col items-center gap-2">
+              {emptyIcon && <span className="opacity-30">{emptyIcon}</span>}
+              {emptyMessage}
+            </div>
+          </div>
+        )}
+
+        {/* Cards */}
+        {!loading && sortedData.map((row, i) => {
+          const key = keyExtractor ? keyExtractor(row) : String(i);
+          const fullWidthCols = visibleCols.filter(c => c.mobileCard?.fullWidth && !c.mobileCard?.hidden);
+          const regularCols   = visibleCols.filter(c => !c.mobileCard?.fullWidth && !c.mobileCard?.isActions && !c.mobileCard?.hidden);
+          const actionsCols   = visibleCols.filter(c => c.mobileCard?.isActions && !c.mobileCard?.hidden);
+          /* Fallback: si no hay configuración mobileCard, mostrar todo como filas */
+          const hasConfig = visibleCols.some(c => c.mobileCard);
+          const fallbackCols = hasConfig ? [] : visibleCols;
+
+          return (
+            <div
+              key={key}
+              className={[
+                'bg-white border border-[var(--color-border-secondary)] rounded-[var(--border-radius-lg)] overflow-hidden animate-row',
+                onRowClick ? 'cursor-pointer active:bg-gray-50' : '',
+              ].join(' ')}
+              style={{ animationDelay: `${i * 30}ms` }}
+              onClick={() => onRowClick?.(row)}
+            >
+              {/* Columna título (fullWidth) */}
+              {fullWidthCols.length > 0 && (
+                <div className="px-4 py-3 border-b border-[var(--color-border-tertiary)]">
+                  {fullWidthCols.map(col => (
+                    <div key={col.key}>
+                      {col.render ? col.render(row, i) : (row[col.key] ?? '—')}
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Columnas regulares: etiqueta + valor */}
+              {(regularCols.length > 0 || fallbackCols.length > 0) && (
+                <div className="px-4 py-3 flex flex-col gap-2">
+                  {(hasConfig ? regularCols : fallbackCols).map(col => (
+                    <div key={col.key} className="flex items-start justify-between gap-3">
+                      <span className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider shrink-0 pt-0.5">
+                        {col.header}
+                      </span>
+                      <div className="text-[12px] text-right min-w-0">
+                        {col.render ? col.render(row, i) : (row[col.key] ?? '—')}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Pie de acciones */}
+              {actionsCols.length > 0 && (
+                <div className="px-4 py-2.5 border-t border-[var(--color-border-tertiary)] bg-gray-50/50 flex items-center gap-4">
+                  {actionsCols.map(col => (
+                    <div key={col.key}>
+                      {col.render ? col.render(row, i) : null}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+
+      {/* ── Tabla — solo desktop ── */}
+      <div className="hidden md:block border border-[var(--color-border-secondary)] rounded-[var(--border-radius-lg)] overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-[12px] border-collapse">
 
