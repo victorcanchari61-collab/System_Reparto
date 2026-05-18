@@ -3,6 +3,7 @@ import { Outlet, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/useAuthStore';
 import Topnav from './Topnav';
 import Sidebar from './Sidebar';
+import ToastContainer from '../components/ui/ToastContainer';
 
 export const DashboardLayout: React.FC = () => {
   const { user } = useAuthStore();
@@ -11,7 +12,8 @@ export const DashboardLayout: React.FC = () => {
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
   useEffect(() => {
-    if (!user) navigate('/login');
+    if (!user)          navigate('/login',  { replace: true });
+    else if (!user.isOwner) navigate('/panel', { replace: true });
   }, [user, navigate]);
 
   if (!user) {
@@ -36,6 +38,7 @@ export const DashboardLayout: React.FC = () => {
           <Outlet />
         </main>
       </div>
+      <ToastContainer />
     </div>
   );
 };

@@ -7,8 +7,6 @@ import {
 import { apiClient } from '../../../lib/api-client';
 import Button from '../../../components/ui/Button';
 import Input from '../../../components/ui/Input';
-import FormSection from '../../../components/form/FormSection';
-import FormGrid from '../../../components/form/FormGrid';
 import CredentialsModal from '../_components/modals/CredentialsModal';
 
 interface CreatedInfo { businessName: string; adminEmail: string; adminPassword: string; }

@@ -7,7 +7,8 @@ public sealed record AuthResponse(
     Guid UserId,
     Guid CompanyId,
     string FullName,
-    string Email);
+    string Email,
+    bool IsOwner);
 
 /// <summary>
 /// Resultado interno del servicio de autenticación.

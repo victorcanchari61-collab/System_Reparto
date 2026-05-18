@@ -10,6 +10,7 @@ internal class Program
     {
         var builder = WebApplication.CreateBuilder(args);
 
+        builder.Services.AddProblemDetails();
         builder.Services.AddControllers();
         builder.Services.AddSignalR();
         builder.Services.AddScoped<IRealtimeNotifier, SignalRRealtimeNotifier>();
@@ -66,6 +67,7 @@ internal class Program
             });
         }
 
+        app.UseExceptionHandler();
         app.UseHttpsRedirection();
         app.UseCors(); // Habilitar CORS
         app.UseWebSockets();

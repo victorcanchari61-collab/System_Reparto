@@ -6,4 +6,6 @@ public sealed record UserResponse(
     string   Email,
     string   Phone,
     bool     IsActive,
-    DateTime CreatedAtUtc);
+    DateTime CreatedAtUtc,
+    Guid?    RoleId,
+    string?  RoleName);

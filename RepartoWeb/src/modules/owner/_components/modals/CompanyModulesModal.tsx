@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import {
   IconPackage, IconTruck, IconUsers, IconReceipt,
-  IconUserCog, IconShield, IconCheck, IconLoader2,
+  IconUserCog, IconShield, IconLoader2,
 } from '@tabler/icons-react';
 import { apiClient } from '../../../../lib/api-client';
 import Modal from '../../../../components/ui/Modal';
 import Button from '../../../../components/ui/Button';
+import { useToast } from '../../../../hooks/use-toast';
 import type { CompanyModule } from '../../../../types/models';
 
-/* ── Icono por módulo ───────────────────────────────────── */
 const MODULE_ICONS: Record<string, React.ReactNode> = {
   orders:  <IconPackage  size={18} />,
   drivers: <IconTruck    size={18} />,
@@ -18,7 +18,6 @@ const MODULE_ICONS: Record<string, React.ReactNode> = {
   roles:   <IconShield   size={18} />,
 };
 
-/* ── Props ──────────────────────────────────────────────── */
 interface Props {
   companyId:   string;
   companyName: string;
@@ -26,7 +25,6 @@ interface Props {
   onClose:     () => void;
 }
 
-/* ── Toggle switch ──────────────────────────────────────── */
 const Toggle: React.FC<{ enabled: boolean; onChange: () => void }> = ({ enabled, onChange }) => (
   <button
     type="button"
@@ -43,15 +41,14 @@ const Toggle: React.FC<{ enabled: boolean; onChange: () => void }> = ({ enabled,
   </button>
 );
 
-/* ── Componente ─────────────────────────────────────────── */
 const CompanyModulesModal: React.FC<Props> = ({ companyId, companyName, isOpen, onClose }) => {
-  const [modules, setModules]   = useState<CompanyModule[]>([]);
-  const [loading, setLoading]   = useState(false);
-  const [saving, setSaving]     = useState(false);
-  const [error, setError]       = useState<string | null>(null);
-  const [dirty, setDirty]       = useState(false);
+  const [modules, setModules] = useState<CompanyModule[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [saving, setSaving]   = useState(false);
+  const [error, setError]     = useState<string | null>(null);
+  const [dirty, setDirty]     = useState(false);
+  const toast                 = useToast();
 
-  /* Cargar módulos al abrir */
   useEffect(() => {
     if (!isOpen) return;
     setLoading(true);
@@ -72,13 +69,16 @@ const CompanyModulesModal: React.FC<Props> = ({ companyId, companyName, isOpen, 
     setSaving(true);
     setError(null);
     try {
-      await apiClient.updateCompanyModules(
+      const updated = await apiClient.updateCompanyModules(
         companyId,
         modules.map(m => ({ key: m.key, isEnabled: m.isEnabled })),
       );
+      const enabledCount = updated.filter(m => m.isEnabled).length;
       setDirty(false);
+      toast.success(`${companyName}: ${enabledCount} módulo${enabledCount !== 1 ? 's' : ''} activo${enabledCount !== 1 ? 's' : ''}.`);
       onClose();
     } catch (e: any) {
+      toast.error(e.message ?? 'Error al guardar los módulos.');
       setError(e.message);
     } finally {
       setSaving(false);
@@ -102,13 +102,7 @@ const CompanyModulesModal: React.FC<Props> = ({ companyId, companyName, isOpen, 
             <Button variant="ghost" size="sm" onClick={onClose} disabled={saving}>
               Cancelar
             </Button>
-            <Button
-              size="sm"
-              loading={saving}
-              disabled={!dirty}
-              icon={<IconCheck size={13} />}
-              onClick={handleSave}
-            >
+            <Button size="sm" loading={saving} disabled={!dirty} onClick={handleSave}>
               Guardar cambios
             </Button>
           </div>
@@ -135,28 +129,21 @@ const CompanyModulesModal: React.FC<Props> = ({ companyId, companyName, isOpen, 
               key={mod.key}
               className={[
                 'flex items-center gap-3 p-3 rounded-[var(--border-radius-md)] border transition-colors',
-                mod.isEnabled
-                  ? 'border-r/30 bg-r3/60'
-                  : 'border-gray-100 bg-gray-50/50',
+                mod.isEnabled ? 'border-r/30 bg-r3/60' : 'border-gray-100 bg-gray-50/50',
               ].join(' ')}
             >
-              {/* Icono */}
               <div className={[
                 'w-9 h-9 rounded-[var(--border-radius-md)] flex items-center justify-center shrink-0',
                 mod.isEnabled ? 'bg-r/10 text-r' : 'bg-gray-100 text-gray-400',
               ].join(' ')}>
                 {MODULE_ICONS[mod.key] ?? <IconPackage size={18} />}
               </div>
-
-              {/* Info */}
               <div className="flex-1 min-w-0">
                 <div className={`text-[13px] font-medium ${mod.isEnabled ? 'text-gray-900' : 'text-gray-500'}`}>
                   {mod.label}
                 </div>
                 <div className="text-[11px] text-gray-400 truncate">{mod.description}</div>
               </div>
-
-              {/* Toggle */}
               <Toggle enabled={mod.isEnabled} onChange={() => toggle(mod.key)} />
             </div>
           ))}

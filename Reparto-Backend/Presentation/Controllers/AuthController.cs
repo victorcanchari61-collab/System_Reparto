@@ -50,7 +50,7 @@ public class AuthController : ControllerBase
     public async Task<IActionResult> Logout([FromBody] RefreshTokenRequest request)
     {
         await _authService.LogoutAsync(request.RefreshToken);
-        return NoContent();
+        return Ok(new { message = "Sesión cerrada correctamente." });
     }
 
     [HttpGet("me")]

@@ -13,15 +13,17 @@ const OwnerLoginPage: React.FC = () => {
   const { login, isLoading, user }      = useAuthStore();
   const navigate                        = useNavigate();
 
-  useEffect(() => { if (user) navigate('/empresas'); }, [user, navigate]);
+  useEffect(() => {
+    if (user) navigate(user.isOwner ? '/empresas' : '/panel', { replace: true });
+  }, [user, navigate]);
 
   const handleSubmit = async (e: { preventDefault(): void }) => {
     e.preventDefault();
     setError(null);
     if (!email.trim() || !password) { setError('Completa todos los campos.'); return; }
     try {
-      await login(email, password);
-      navigate('/empresas');
+      const isOwner = await login(email, password);
+      navigate(isOwner ? '/empresas' : '/panel', { replace: true });
     } catch (err: any) {
       setError(err.message || 'Credenciales incorrectas.');
     }

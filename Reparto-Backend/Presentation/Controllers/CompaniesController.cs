@@ -122,6 +122,16 @@ public class CompaniesController(ApplicationDbContext db) : ControllerBase
         }
 
         await db.SaveChangesAsync();
-        return NoContent();
+
+        var updated = await db.CompanyModules
+            .Where(m => m.CompanyId == id)
+            .ToListAsync();
+
+        var result = SaasModules.All.Select(def => new CompanyModuleResponse(
+            def.Key, def.Label, def.Description,
+            updated.FirstOrDefault(e => e.ModuleKey == def.Key)?.IsEnabled ?? false,
+            updated.FirstOrDefault(e => e.ModuleKey == def.Key)?.ExpiresAt));
+
+        return Ok(result);
     }
 }

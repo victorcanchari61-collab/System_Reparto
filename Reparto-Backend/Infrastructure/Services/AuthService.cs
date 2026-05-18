@@ -83,6 +83,8 @@ public sealed class AuthService : IAuthService
             PhoneNumber = request.AdminPhone.Trim()
         };
 
+        user.Company = company; // make navigation property available for JWT building
+
         var userResult = await _userManager.CreateAsync(user, request.AdminPassword);
         if (!userResult.Succeeded)
             return AuthResult.Failure(string.Join(", ", userResult.Errors.Select(e => e.Description)));
@@ -175,6 +177,7 @@ public sealed class AuthService : IAuthService
             user.Id,
             user.CompanyId,
             user.FullName,
-            user.Email ?? string.Empty);
+            user.Email ?? string.Empty,
+            user.Company?.IsOwner ?? false);
     }
 }

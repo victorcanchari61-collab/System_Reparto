@@ -1,24 +1,42 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { IconTruck, IconAlertCircle, IconEye, IconEyeOff } from '@tabler/icons-react';
 import { useAuthStore } from '../../../store/useAuthStore';
 import Button from '../../../components/ui/Button';
 import Input from '../../../components/ui/Input';
 
+const REMEMBER_KEY = 'nexus_remember_client';
+
 const ClientLoginPage: React.FC = () => {
   const [email, setEmail]         = useState('');
   const [password, setPassword]   = useState('');
   const [showPw, setShowPw]       = useState(false);
+  const [remember, setRemember]   = useState(false);
   const [error, setError]         = useState<string | null>(null);
   const { login, isLoading }      = useAuthStore();
   const navigate                  = useNavigate();
+
+  useEffect(() => {
+    const saved = localStorage.getItem(REMEMBER_KEY);
+    if (saved) {
+      const { email: e, password: p } = JSON.parse(saved);
+      setEmail(e);
+      setPassword(p);
+      setRemember(true);
+    }
+  }, []);
 
   const handleSubmit = async (e: { preventDefault(): void }) => {
     e.preventDefault();
     setError(null);
     try {
-      await login(email.trim(), password);
-      navigate('/panel');
+      const isOwner = await login(email.trim(), password);
+      if (remember) {
+        localStorage.setItem(REMEMBER_KEY, JSON.stringify({ email: email.trim(), password }));
+      } else {
+        localStorage.removeItem(REMEMBER_KEY);
+      }
+      navigate(isOwner ? '/empresas' : '/panel', { replace: true });
     } catch {
       setError('Credenciales incorrectas o usuario inactivo.');
     }
@@ -76,6 +94,16 @@ const ClientLoginPage: React.FC = () => {
                 }
               />
             </div>
+
+            <label className="flex items-center gap-2 cursor-pointer select-none">
+              <input
+                type="checkbox"
+                checked={remember}
+                onChange={e => setRemember(e.target.checked)}
+                className="w-3.5 h-3.5 accent-[#C0392B] cursor-pointer"
+              />
+              <span className="text-[12px] text-gray-500">Recordar credenciales</span>
+            </label>
 
             {error && (
               <div className="flex items-center gap-1.5 bg-r3 border border-[#F1948A] rounded-[var(--border-radius-md)] px-3 py-2.5 text-[12px] text-r4">

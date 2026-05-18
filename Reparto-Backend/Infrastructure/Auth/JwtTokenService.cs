@@ -27,7 +27,8 @@ public sealed class JwtTokenService(
             new(ClaimTypes.NameIdentifier, user.Id.ToString()),
             new(ClaimTypes.Email, user.Email ?? string.Empty),
             new(ClaimTypes.Name, user.FullName),
-            new(PermissionClaimTypes.CompanyId, user.CompanyId.ToString())
+            new(PermissionClaimTypes.CompanyId, user.CompanyId.ToString()),
+            new("is_owner", (user.Company?.IsOwner ?? false).ToString().ToLowerInvariant())
         };
 
         foreach (var roleName in roles)

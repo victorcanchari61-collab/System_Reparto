@@ -5,6 +5,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using MongoDB.Driver;
 using Reparto_Backend.Application.Abstractions.Auth;
+using Reparto_Backend.Application.Abstractions.Roles;
+using Reparto_Backend.Application.Abstractions.Users;
 using Reparto_Backend.Application.Authorization;
 using Reparto_Backend.Infrastructure.Auth;
 using Reparto_Backend.Infrastructure.Options;
@@ -32,6 +34,8 @@ public static class InfrastructureServiceCollectionExtensions
         services.AddSingleton<IRefreshTokenService, RefreshTokenService>();
         services.AddScoped<ITenantProvider, TenantProvider>();
         services.AddScoped<IAuthService, AuthService>();
+        services.AddScoped<IUserService, UserService>();
+        services.AddScoped<IRoleService, RoleService>();
 
         return services;
     }

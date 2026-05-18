@@ -24,6 +24,8 @@ public sealed class Company
 
     public bool IsActive { get; set; } = true;
 
+    public bool IsOwner { get; set; } = false;
+
     public DateTime CreatedAtUtc { get; set; } = DateTime.UtcNow;
 
     public ICollection<CompanyModule> Modules { get; set; } = [];

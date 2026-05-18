@@ -1,4 +1,4 @@
-import type { User } from '../types';
+import type { UserRecord, Role, RoleDetail, PermissionGroup } from '../types/models';
 
 const BACKEND_URL = '/api';
 
@@ -80,90 +80,55 @@ export const apiClient = {
     return await response.json();
   },
 
-  getUsers: async (): Promise<User[]> => {
-    const token = localStorage.getItem('nexus_access_token');
-    
-    if (token) {
-      try {
-        const response = await fetch(`${BACKEND_URL}/users`, {
-          method: 'GET',
-          headers: getHeaders()
-        });
-        if (response.ok) {
-          const apiUsers = await response.json();
-          return apiUsers.map((u: any) => {
-            const initials = u.fullName.split(' ').map((n: string) => n[0]).join('').substring(0, 2).toUpperCase() || 'US';
-            const redPalette = ['#C0392B', '#E74C3C', '#922B21', '#641E16'];
-            
-            let hash = 0;
-            for (let i = 0; i < u.email.length; i++) {
-              hash = u.email.charCodeAt(i) + ((hash << 5) - hash);
-            }
-            const avatarColor = redPalette[Math.abs(hash) % redPalette.length];
-            return {
-              id: u.id,
-              name: u.fullName,
-              email: u.email,
-              role: u.email.includes('admin') ? 'Admin' : 'Empleado',
-              roleKey: u.email.includes('admin') ? 'admin' : 'empleado',
-              status: u.isActive ? 'active' : 'inactive',
-              lastAccess: 'hace poco',
-              initials: initials,
-              avatarColor: avatarColor,
-              enterpriseId: localStorage.getItem('nexus_company_id') || 'custom-tenant'
-            };
-          });
-        }
-      } catch (err) {
-        console.error('Error fetching real users:', err);
-      }
-    }
-    return [];
+  /* ── Usuarios del tenant ─────────────────────────────── */
+
+  getClientUsers: async (): Promise<UserRecord[]> => {
+    const response = await fetch(`${BACKEND_URL}/users`, { headers: getHeaders() });
+    if (!response.ok) throw new Error('Error al obtener los usuarios.');
+    return await response.json();
   },
 
-  createUser: async (data: {
-    name: string;
+  createClientUser: async (data: {
+    fullName: string;
     email: string;
-    roleKey: string;
-    phone?: string;
-    password?: string;
-  }): Promise<User> => {
-    const token = localStorage.getItem('nexus_access_token');
-    
-    if (token) {
-      const response = await fetch(`${BACKEND_URL}/users`, {
-        method: 'POST',
-        headers: getHeaders(),
-        body: JSON.stringify({
-          fullName: data.name,
-          email: data.email,
-          phone: data.phone || '999999999',
-          password: data.password || 'Admin123!'
-        })
-      });
-
-      if (response.ok) {
-        const apiUser = await response.json();
-        const initials = apiUser.fullName.split(' ').map((n: string) => n[0]).join('').substring(0, 2).toUpperCase() || 'US';
-
-        return {
-          id: apiUser.id,
-          name: apiUser.fullName,
-          email: apiUser.email,
-          role: data.roleKey === 'admin' ? 'Admin' : 'Empleado',
-          roleKey: data.roleKey,
-          status: apiUser.isActive ? 'active' : 'inactive',
-          lastAccess: 'nunca',
-          initials: initials,
-          avatarColor: '#C0392B',
-          enterpriseId: localStorage.getItem('nexus_company_id') || 'custom-tenant'
-        };
-      } else {
-        const errRes = await response.json();
-        throw new Error(errRes.message || errRes.errors?.[0] || 'Error al crear usuario en el backend.');
-      }
+    phone: string;
+    password: string;
+    roleId?: string | null;
+  }): Promise<UserRecord> => {
+    const response = await fetch(`${BACKEND_URL}/users`, {
+      method: 'POST',
+      headers: getHeaders(),
+      body: JSON.stringify(data),
+    });
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({}));
+      throw new Error(err.message || 'Error al crear el usuario.');
     }
-    throw new Error('Sesión no válida o sin token de autorización.');
+    return await response.json();
+  },
+
+  updateUser: async (id: string, data: { fullName: string; phone: string }): Promise<void> => {
+    const response = await fetch(`${BACKEND_URL}/users/${id}`, {
+      method: 'PUT',
+      headers: getHeaders(),
+      body: JSON.stringify(data),
+    });
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({}));
+      throw new Error(err.message || 'Error al actualizar el usuario.');
+    }
+  },
+
+  assignUserRole: async (userId: string, roleId: string): Promise<void> => {
+    const response = await fetch(`${BACKEND_URL}/users/${userId}/role`, {
+      method: 'PUT',
+      headers: getHeaders(),
+      body: JSON.stringify({ roleId }),
+    });
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({}));
+      throw new Error(err.message || 'Error al asignar el rol.');
+    }
   },
 
   getCompany: async (id: string) => {
@@ -220,22 +185,91 @@ export const apiClient = {
       headers: getHeaders(),
       body: JSON.stringify({ modules }),
     });
-    if (!response.ok) throw new Error('Error al actualizar los módulos.');
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({}));
+      throw new Error((err as any).detail ?? (err as any).message ?? 'Error al actualizar los módulos.');
+    }
+    return await response.json() as import('../types/models').CompanyModule[];
   },
 
-  toggleUserStatus: async (userId: string): Promise<boolean> => {
-    const token = localStorage.getItem('nexus_access_token');
-    
-    if (token) {
-      const response = await fetch(`${BACKEND_URL}/users/${userId}`, {
-        method: 'DELETE',
-        headers: getHeaders()
-      });
-      if (response.ok) {
-        return true;
-      }
-      throw new Error('Error al cambiar el estado del usuario en el backend.');
+  toggleUserStatus: async (userId: string): Promise<void> => {
+    const response = await fetch(`${BACKEND_URL}/users/${userId}`, {
+      method: 'DELETE',
+      headers: getHeaders(),
+    });
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({}));
+      throw new Error(err.message || 'Error al cambiar el estado del usuario.');
     }
-    return false;
-  }
+  },
+
+  /* ── Roles del tenant ────────────────────────────────── */
+
+  getRoles: async (): Promise<Role[]> => {
+    const response = await fetch(`${BACKEND_URL}/roles`, { headers: getHeaders() });
+    if (!response.ok) throw new Error('Error al obtener los roles.');
+    return await response.json();
+  },
+
+  getRoleById: async (id: string): Promise<RoleDetail> => {
+    const response = await fetch(`${BACKEND_URL}/roles/${id}`, { headers: getHeaders() });
+    if (!response.ok) throw new Error('Error al obtener el rol.');
+    return await response.json();
+  },
+
+  createRole: async (data: { name: string; description?: string }): Promise<Role> => {
+    const response = await fetch(`${BACKEND_URL}/roles`, {
+      method: 'POST',
+      headers: getHeaders(),
+      body: JSON.stringify(data),
+    });
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({}));
+      throw new Error(err.message || 'Error al crear el rol.');
+    }
+    return await response.json();
+  },
+
+  updateRole: async (id: string, data: { name: string; description?: string }): Promise<void> => {
+    const response = await fetch(`${BACKEND_URL}/roles/${id}`, {
+      method: 'PUT',
+      headers: getHeaders(),
+      body: JSON.stringify(data),
+    });
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({}));
+      throw new Error(err.message || 'Error al actualizar el rol.');
+    }
+  },
+
+  deleteRole: async (id: string): Promise<void> => {
+    const response = await fetch(`${BACKEND_URL}/roles/${id}`, {
+      method: 'DELETE',
+      headers: getHeaders(),
+    });
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({}));
+      throw new Error(err.message || 'Error al eliminar el rol.');
+    }
+  },
+
+  setRolePermissions: async (id: string, permissions: string[]): Promise<void> => {
+    const response = await fetch(`${BACKEND_URL}/roles/${id}/permissions`, {
+      method: 'PUT',
+      headers: getHeaders(),
+      body: JSON.stringify({ permissions }),
+    });
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({}));
+      throw new Error(err.message || 'Error al guardar los permisos.');
+    }
+  },
+
+  /* ── Permisos del sistema ────────────────────────────── */
+
+  getPermissions: async (): Promise<PermissionGroup[]> => {
+    const response = await fetch(`${BACKEND_URL}/permissions`, { headers: getHeaders() });
+    if (!response.ok) throw new Error('Error al obtener los permisos.');
+    return await response.json();
+  },
 };

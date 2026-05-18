@@ -15,31 +15,42 @@ export interface CompanyModule {
   expiresAt: string | null;
 }
 
-export interface User {
+/* ── Client-panel types ─────────────────────────────────── */
+
+export interface UserRecord {
+  id: string;
+  fullName: string;
+  email: string;
+  phone: string;
+  isActive: boolean;
+  createdAtUtc: string;
+  roleId: string | null;
+  roleName: string | null;
+}
+
+export interface Role {
   id: string;
   name: string;
-  email: string;
-  role: string;
-  roleKey: string;
-  status: 'active' | 'inactive';
-  lastAccess: string;
-  initials: string;
-  avatarColor: string;
-  enterpriseId: string;
-}
-
-export type UserRole = 'superadmin' | 'admin' | 'supervisor' | 'empleado' | 'reader';
-
-export interface Permissions {
-  usuarios: { ver: boolean; crear: boolean; editar: boolean; eliminar: boolean };
-  roles: { ver: boolean; crear: boolean; editar: boolean; eliminar: boolean };
-  reportes: { ver: boolean; exportar: boolean };
-}
-
-export interface RolePermissions {
-  roleName: string;
-  roleKey: string;
-  usersCount: number;
+  description: string;
   isSystem: boolean;
-  permissions: Permissions;
+  permissionCount: number;
+}
+
+export interface RoleDetail {
+  id: string;
+  name: string;
+  description: string;
+  isSystem: boolean;
+  permissions: string[];
+}
+
+export interface PermissionItem {
+  key: string;
+  label: string;
+}
+
+export interface PermissionGroup {
+  module: string;
+  label: string;
+  permissions: PermissionItem[];
 }
