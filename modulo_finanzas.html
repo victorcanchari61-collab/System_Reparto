@@ -1,0 +1,461 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+.app{display:flex;height:100vh;min-height:640px;background:var(--color-background-tertiary);}
+.sidebar{width:230px;min-width:230px;background:var(--color-background-primary);border-right:0.5px solid var(--color-border-tertiary);display:flex;flex-direction:column;overflow-y:auto;}
+.sb-head{padding:20px 16px 14px;border-bottom:0.5px solid var(--color-border-tertiary);}
+.sb-logo{font-size:15px;font-weight:500;color:var(--color-text-primary);}
+.sb-sub{font-size:12px;color:var(--color-text-secondary);margin-top:2px;}
+.nav-sec{padding:12px 0 4px;}
+.nav-lbl{font-size:10px;font-weight:500;color:var(--color-text-tertiary);text-transform:uppercase;letter-spacing:.08em;padding:0 16px;margin-bottom:4px;}
+.nav-item{display:flex;align-items:center;gap:10px;padding:8px 16px;cursor:pointer;font-size:13px;color:var(--color-text-secondary);border-left:2px solid transparent;transition:all .15s;}
+.nav-item:hover{background:var(--color-background-secondary);color:var(--color-text-primary);}
+.nav-item.active{background:#E6F1FB;color:#185FA5;border-left-color:#378ADD;font-weight:500;}
+.nav-icon{font-size:14px;width:18px;text-align:center;}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+.topbar{background:var(--color-background-primary);border-bottom:0.5px solid var(--color-border-tertiary);padding:12px 24px;display:flex;align-items:center;justify-content:space-between;}
+.page-title{font-size:16px;font-weight:500;color:var(--color-text-primary);}
+.page-crumb{font-size:12px;color:var(--color-text-tertiary);margin-top:2px;}
+.tb-actions{display:flex;gap:8px;}
+.btn{padding:6px 14px;border-radius:var(--border-radius-md);font-size:13px;cursor:pointer;border:0.5px solid var(--color-border-secondary);background:var(--color-background-primary);color:var(--color-text-primary);}
+.btn-p{background:#185FA5;color:#fff;border-color:#185FA5;}
+.content{flex:1;overflow-y:auto;padding:24px;}
+.kpi-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:24px;}
+.kpi-grid-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:24px;}
+.kpi{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:16px;}
+.kpi-lbl{font-size:12px;color:var(--color-text-secondary);margin-bottom:6px;}
+.kpi-val{font-size:22px;font-weight:500;color:var(--color-text-primary);}
+.kpi-delta{font-size:11px;margin-top:4px;}
+.up{color:#3B6D11;} .down{color:#A32D2D;}
+.sec{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);margin-bottom:20px;overflow:hidden;}
+.sec-hd{padding:14px 18px;border-bottom:0.5px solid var(--color-border-tertiary);display:flex;align-items:center;justify-content:space-between;}
+.sec-ttl{font-size:14px;font-weight:500;color:var(--color-text-primary);}
+.sec-bdg{font-size:11px;padding:2px 10px;border-radius:99px;background:var(--color-background-info);color:var(--color-text-info);}
+table{width:100%;border-collapse:collapse;font-size:13px;}
+th{text-align:left;font-size:11px;font-weight:500;color:var(--color-text-tertiary);text-transform:uppercase;letter-spacing:.06em;padding:10px 18px;border-bottom:0.5px solid var(--color-border-tertiary);}
+td{padding:11px 18px;border-bottom:0.5px solid var(--color-border-tertiary);color:var(--color-text-primary);}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:var(--color-background-secondary);}
+.bdg{display:inline-block;font-size:11px;padding:2px 8px;border-radius:99px;}
+.bdg-g{background:#EAF3DE;color:#3B6D11;}
+.bdg-a{background:#FAEEDA;color:#854F0B;}
+.bdg-r{background:#FCEBEB;color:#A32D2D;}
+.bdg-b{background:#E6F1FB;color:#185FA5;}
+.bdg-gr{background:#F1EFE8;color:#5F5E5A;}
+.bdg-t{background:#E1F5EE;color:#0F6E56;}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;}
+.bar-wrap{padding:16px 18px;}
+.bar-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.bar-lbl{font-size:12px;color:var(--color-text-secondary);width:90px;text-align:right;flex-shrink:0;}
+.bar-track{flex:1;height:8px;background:var(--color-background-secondary);border-radius:4px;overflow:hidden;}
+.bar-fill{height:100%;border-radius:4px;}
+.bar-val{font-size:12px;color:var(--color-text-primary);width:80px;font-weight:500;}
+.hidden{display:none;}
+.spark{display:flex;align-items:flex-end;gap:2px;height:32px;}
+.spark-bar{width:6px;border-radius:2px 2px 0 0;}
+.progress-wrap{padding:0 18px 16px;}
+.prog-row{margin-bottom:12px;}
+.prog-head{display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px;}
+.prog-track{height:6px;background:var(--color-background-secondary);border-radius:3px;overflow:hidden;}
+.prog-fill{height:100%;border-radius:3px;}
+.ratio-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1px;background:var(--color-border-tertiary);}
+.ratio-cell{background:var(--color-background-primary);padding:16px 18px;}
+.ratio-nm{font-size:12px;color:var(--color-text-secondary);margin-bottom:4px;}
+.ratio-val{font-size:20px;font-weight:500;color:var(--color-text-primary);}
+.ratio-ref{font-size:11px;color:var(--color-text-tertiary);margin-top:2px;}
+.tgl-wrap{display:flex;gap:8px;margin-bottom:16px;}
+.tgl{padding:5px 14px;border-radius:99px;font-size:12px;cursor:pointer;border:0.5px solid var(--color-border-secondary);background:var(--color-background-primary);color:var(--color-text-secondary);}
+.tgl.on{background:#E6F1FB;color:#185FA5;border-color:#85B7EB;}
+.timeline{padding:16px 18px;}
+.tl-row{display:flex;gap:14px;margin-bottom:16px;align-items:flex-start;}
+.tl-dot{width:10px;height:10px;border-radius:50%;margin-top:4px;flex-shrink:0;}
+.tl-body{flex:1;}
+.tl-date{font-size:11px;color:var(--color-text-tertiary);}
+.tl-text{font-size:13px;color:var(--color-text-primary);}
+.tl-amt{font-size:13px;font-weight:500;}
+</style>
+
+<div class="app">
+<div class="sidebar">
+  <div class="sb-head">
+    <div class="sb-logo">FinanzCloud</div>
+    <div class="sb-sub">Módulo Finanzas</div>
+  </div>
+  <div class="nav-sec">
+    <div class="nav-lbl">Principal</div>
+    <div class="nav-item active" onclick="nav(this,'dashboard')"><span class="nav-icon">◼</span> Dashboard</div>
+    <div class="nav-item" onclick="nav(this,'kpis')"><span class="nav-icon">▦</span> Indicadores KPI</div>
+    <div class="nav-item" onclick="nav(this,'ratios')"><span class="nav-icon">◑</span> Ratios Financieros</div>
+  </div>
+  <div class="nav-sec">
+    <div class="nav-lbl">Inversiones</div>
+    <div class="nav-item" onclick="nav(this,'portafolio')"><span class="nav-icon">◈</span> Portafolio</div>
+    <div class="nav-item" onclick="nav(this,'activos')"><span class="nav-icon">▤</span> Activos Financieros</div>
+    <div class="nav-item" onclick="nav(this,'valoracion')"><span class="nav-icon">◧</span> Valoración</div>
+  </div>
+  <div class="nav-sec">
+    <div class="nav-lbl">Deuda y Capital</div>
+    <div class="nav-item" onclick="nav(this,'deuda')"><span class="nav-icon">☰</span> Deuda / Créditos</div>
+    <div class="nav-item" onclick="nav(this,'capital')"><span class="nav-icon">●</span> Estructura de Capital</div>
+    <div class="nav-item" onclick="nav(this,'dividendos')"><span class="nav-icon">▷</span> Dividendos</div>
+  </div>
+  <div class="nav-sec">
+    <div class="nav-lbl">Planeación</div>
+    <div class="nav-item" onclick="nav(this,'presupuesto')"><span class="nav-icon">✎</span> Presupuesto</div>
+    <div class="nav-item" onclick="nav(this,'proyecciones')"><span class="nav-icon">⇄</span> Proyecciones</div>
+    <div class="nav-item" onclick="nav(this,'riesgos')"><span class="nav-icon">◉</span> Riesgos</div>
+  </div>
+</div>
+
+<div class="main">
+  <div class="topbar">
+    <div>
+      <div class="page-title" id="page-title">Dashboard financiero</div>
+      <div class="page-crumb" id="page-crumb">Finanzas / Inicio</div>
+    </div>
+    <div class="tb-actions">
+      <button class="btn">Exportar</button>
+      <button class="btn btn-p">+ Nuevo</button>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- DASHBOARD -->
+    <div id="view-dashboard">
+      <div class="kpi-grid">
+        <div class="kpi"><div class="kpi-lbl">Valor empresa (EV)</div><div class="kpi-val">S/ 4.2M</div><div class="kpi-delta up">▲ 8.3% YTD</div></div>
+        <div class="kpi"><div class="kpi-lbl">ROE</div><div class="kpi-val">23.4%</div><div class="kpi-delta up">▲ 2.1 pp</div></div>
+        <div class="kpi"><div class="kpi-lbl">EBITDA</div><div class="kpi-val">S/ 98,420</div><div class="kpi-delta up">▲ 14.6%</div></div>
+        <div class="kpi"><div class="kpi-lbl">Deuda neta / EBITDA</div><div class="kpi-val">0.87x</div><div class="kpi-delta up">▼ 0.12x mejor</div></div>
+      </div>
+      <div class="two-col">
+        <div class="sec">
+          <div class="sec-hd"><span class="sec-ttl">Rentabilidad mensual</span><span class="sec-bdg">2025</span></div>
+          <div class="bar-wrap">
+            <div class="bar-row"><div class="bar-lbl">Enero</div><div class="bar-track"><div class="bar-fill" style="width:62%;background:#378ADD;"></div></div><div class="bar-val">S/ 48,200</div></div>
+            <div class="bar-row"><div class="bar-lbl">Febrero</div><div class="bar-track"><div class="bar-fill" style="width:70%;background:#378ADD;"></div></div><div class="bar-val">S/ 54,800</div></div>
+            <div class="bar-row"><div class="bar-lbl">Marzo</div><div class="bar-track"><div class="bar-fill" style="width:91%;background:#1D9E75;"></div></div><div class="bar-val">S/ 71,430</div></div>
+            <div class="bar-row"><div class="bar-lbl">Proyect. Abr</div><div class="bar-track"><div class="bar-fill" style="width:80%;background:#EF9F27;"></div></div><div class="bar-val">S/ 62,000</div></div>
+          </div>
+        </div>
+        <div class="sec">
+          <div class="sec-hd"><span class="sec-ttl">Alertas y eventos</span></div>
+          <div class="timeline">
+            <div class="tl-row"><div class="tl-dot" style="background:#A32D2D;"></div><div class="tl-body"><div class="tl-date">Hoy — vence en 5 días</div><div class="tl-text">Pago cuota préstamo BCP</div><div class="tl-amt down">S/ 5,980</div></div></div>
+            <div class="tl-row"><div class="tl-dot" style="background:#BA7517;"></div><div class="tl-body"><div class="tl-date">08 Abr — pendiente</div><div class="tl-text">Revisión presupuesto Q2</div></div></div>
+            <div class="tl-row"><div class="tl-dot" style="background:#3B6D11;"></div><div class="tl-body"><div class="tl-date">15 Abr — cobro esperado</div><div class="tl-text">Dividendo fondo mutuo</div><div class="tl-amt up">S/ 3,200</div></div></div>
+            <div class="tl-row"><div class="tl-dot" style="background:#185FA5;"></div><div class="tl-body"><div class="tl-date">20 Abr — vencimiento</div><div class="tl-text">Pago IGV + Renta SUNAT</div><div class="tl-amt down">S/ 11,665</div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- KPIs -->
+    <div id="view-kpis" class="hidden">
+      <div class="sec">
+        <div class="sec-hd"><span class="sec-ttl">Indicadores financieros clave</span><span class="sec-bdg">Q1 2025</span></div>
+        <div class="ratio-grid">
+          <div class="ratio-cell"><div class="ratio-nm">Margen bruto</div><div class="ratio-val">62.9%</div><div class="ratio-ref">Meta: 60% — <span class="up">OK</span></div></div>
+          <div class="ratio-cell"><div class="ratio-nm">Margen EBITDA</div><div class="ratio-val">53.4%</div><div class="ratio-ref">Meta: 50% — <span class="up">OK</span></div></div>
+          <div class="ratio-cell"><div class="ratio-nm">Margen neto</div><div class="ratio-val">30.7%</div><div class="ratio-ref">Meta: 28% — <span class="up">OK</span></div></div>
+          <div class="ratio-cell"><div class="ratio-nm">ROA</div><div class="ratio-val">18.5%</div><div class="ratio-ref">Sector: 14% — <span class="up">Sobre media</span></div></div>
+          <div class="ratio-cell"><div class="ratio-nm">ROE</div><div class="ratio-val">23.4%</div><div class="ratio-ref">Sector: 18% — <span class="up">Sobre media</span></div></div>
+          <div class="ratio-cell"><div class="ratio-nm">ROIC</div><div class="ratio-val">21.1%</div><div class="ratio-ref">WACC: 12% — <span class="up">Creando valor</span></div></div>
+          <div class="ratio-cell"><div class="ratio-nm">Crecimiento ventas</div><div class="ratio-val">12.4%</div><div class="ratio-ref">Meta: 10% — <span class="up">OK</span></div></div>
+          <div class="ratio-cell"><div class="ratio-nm">Rotación activos</div><div class="ratio-val">0.60x</div><div class="ratio-ref">Meta: 0.55x — <span class="up">OK</span></div></div>
+          <div class="ratio-cell"><div class="ratio-nm">Gastos / Ingresos</div><div class="ratio-val">38.6%</div><div class="ratio-ref">Meta: &lt;40% — <span class="up">OK</span></div></div>
+        </div>
+      </div>
+      <div class="sec">
+        <div class="sec-hd"><span class="sec-ttl">Avance de metas anuales</span></div>
+        <div class="progress-wrap" style="padding-top:16px;">
+          <div class="prog-row"><div class="prog-head"><span style="color:var(--color-text-primary);">Ingresos anuales</span><span style="color:var(--color-text-secondary);">S/ 552,960 / S/ 750,000</span></div><div class="prog-track"><div class="prog-fill" style="width:74%;background:#378ADD;"></div></div></div>
+          <div class="prog-row"><div class="prog-head"><span style="color:var(--color-text-primary);">Utilidad neta</span><span style="color:var(--color-text-secondary);">S/ 169,812 / S/ 220,000</span></div><div class="prog-track"><div class="prog-fill" style="width:77%;background:#1D9E75;"></div></div></div>
+          <div class="prog-row"><div class="prog-head"><span style="color:var(--color-text-primary);">Reducción de deuda</span><span style="color:var(--color-text-secondary);">S/ 15,940 / S/ 40,000</span></div><div class="prog-track"><div class="prog-fill" style="width:40%;background:#EF9F27;"></div></div></div>
+          <div class="prog-row"><div class="prog-head"><span style="color:var(--color-text-primary);">EBITDA acumulado</span><span style="color:var(--color-text-secondary);">S/ 295,260 / S/ 400,000</span></div><div class="prog-track"><div class="prog-fill" style="width:74%;background:#7F77DD;"></div></div></div>
+          <div class="prog-row"><div class="prog-head"><span style="color:var(--color-text-primary);">Nuevos clientes</span><span style="color:var(--color-text-secondary);">18 / 30</span></div><div class="prog-track"><div class="prog-fill" style="width:60%;background:#D85A30;"></div></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RATIOS FINANCIEROS -->
+    <div id="view-ratios" class="hidden">
+      <div class="sec">
+        <div class="sec-hd"><span class="sec-ttl">Ratios de liquidez</span></div>
+        <table>
+          <thead><tr><th>Ratio</th><th>Fórmula</th><th>Valor</th><th>Referencia</th><th>Interpretación</th></tr></thead>
+          <tbody>
+            <tr><td>Liquidez corriente</td><td>Activo Cte. / Pasivo Cte.</td><td>4.08x</td><td>> 1.5x</td><td><span class="bdg bdg-g">Muy buena</span></td></tr>
+            <tr><td>Prueba ácida</td><td>(Act. Cte - Inventario) / Pas. Cte.</td><td>2.86x</td><td>> 1.0x</td><td><span class="bdg bdg-g">Muy buena</span></td></tr>
+            <tr><td>Efectivo</td><td>Caja+Bancos / Pasivo Cte.</td><td>2.01x</td><td>> 0.5x</td><td><span class="bdg bdg-g">Excelente</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="sec">
+        <div class="sec-hd"><span class="sec-ttl">Ratios de endeudamiento</span></div>
+        <table>
+          <thead><tr><th>Ratio</th><th>Valor</th><th>Referencia</th><th>Estado</th></tr></thead>
+          <tbody>
+            <tr><td>Deuda / Patrimonio</td><td>1.17x</td><td>< 1.5x</td><td><span class="bdg bdg-g">Saludable</span></td></tr>
+            <tr><td>Deuda / EBITDA</td><td>0.87x</td><td>< 3.0x</td><td><span class="bdg bdg-g">Bajo riesgo</span></td></tr>
+            <tr><td>Cobertura de intereses</td><td>82.9x</td><td>> 3.0x</td><td><span class="bdg bdg-g">Excelente</span></td></tr>
+            <tr><td>Apalancamiento financiero</td><td>2.17x</td><td>< 3.0x</td><td><span class="bdg bdg-g">Controlado</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="sec">
+        <div class="sec-hd"><span class="sec-ttl">Ratios de rentabilidad</span></div>
+        <table>
+          <thead><tr><th>Ratio</th><th>2023</th><th>2024</th><th>2025 Q1</th><th>Tendencia</th></tr></thead>
+          <tbody>
+            <tr><td>ROE</td><td>17.2%</td><td>21.3%</td><td>23.4%</td><td><span class="up">▲ Mejorando</span></td></tr>
+            <tr><td>ROA</td><td>12.8%</td><td>16.1%</td><td>18.5%</td><td><span class="up">▲ Mejorando</span></td></tr>
+            <tr><td>Margen neto</td><td>22.4%</td><td>27.9%</td><td>30.7%</td><td><span class="up">▲ Mejorando</span></td></tr>
+            <tr><td>ROIC</td><td>15.6%</td><td>18.9%</td><td>21.1%</td><td><span class="up">▲ Mejorando</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- PORTAFOLIO -->
+    <div id="view-portafolio" class="hidden">
+      <div class="kpi-grid">
+        <div class="kpi"><div class="kpi-lbl">Valor total portafolio</div><div class="kpi-val">S/ 248,400</div><div class="kpi-delta up">▲ 9.2% YTD</div></div>
+        <div class="kpi"><div class="kpi-lbl">Rendimiento anual</div><div class="kpi-val">14.3%</div><div class="kpi-delta up">▲ vs 8% benchmark</div></div>
+        <div class="kpi"><div class="kpi-lbl">Nro. instrumentos</div><div class="kpi-val">7</div><div class="kpi-delta" style="color:var(--color-text-tertiary);">Diversificado</div></div>
+        <div class="kpi"><div class="kpi-lbl">Ganancia no realizada</div><div class="kpi-val">S/ 20,640</div><div class="kpi-delta up">▲ 9.1%</div></div>
+      </div>
+      <div class="sec">
+        <div class="sec-hd"><span class="sec-ttl">Detalle del portafolio de inversiones</span></div>
+        <table>
+          <thead><tr><th>Instrumento</th><th>Tipo</th><th>Valor costo</th><th>Valor mercado</th><th>G/P</th><th>Rend. anual</th><th>Peso</th><th>Estado</th></tr></thead>
+          <tbody>
+            <tr><td>Fondo Mutuo Renta Fija BCP</td><td><span class="bdg bdg-b">Fondo</span></td><td>S/ 60,000</td><td>S/ 64,800</td><td><span class="up">+S/ 4,800</span></td><td>8.0%</td><td>26.1%</td><td><span class="bdg bdg-g">Activo</span></td></tr>
+            <tr><td>Acciones Alicorp S.A.A.</td><td><span class="bdg bdg-t">Renta variable</span></td><td>S/ 40,000</td><td>S/ 46,200</td><td><span class="up">+S/ 6,200</span></td><td>15.5%</td><td>18.6%</td><td><span class="bdg bdg-g">Activo</span></td></tr>
+            <tr><td>Bono Corp. Credicorp 2027</td><td><span class="bdg bdg-gr">Renta fija</span></td><td>S/ 50,000</td><td>S/ 51,500</td><td><span class="up">+S/ 1,500</span></td><td>6.8%</td><td>20.7%</td><td><span class="bdg bdg-g">Activo</span></td></tr>
+            <tr><td>Acciones BVL — InRetail</td><td><span class="bdg bdg-t">Renta variable</span></td><td>S/ 35,000</td><td>S/ 38,400</td><td><span class="up">+S/ 3,400</span></td><td>9.7%</td><td>15.5%</td><td><span class="bdg bdg-g">Activo</span></td></tr>
+            <tr><td>ETF iShares S&P 500 (USD)</td><td><span class="bdg bdg-b">ETF</span></td><td>S/ 25,000</td><td>S/ 29,200</td><td><span class="up">+S/ 4,200</span></td><td>16.8%</td><td>11.8%</td><td><span class="bdg bdg-g">Activo</span></td></tr>
+            <tr><td>Depósito a plazo Scotiabank</td><td><span class="bdg bdg-gr">Depósito</span></td><td>S/ 15,000</td><td>S/ 15,540</td><td><span class="up">+S/ 540</span></td><td>3.6%</td><td>6.3%</td><td><span class="bdg bdg-a">Por vencer</span></td></tr>
+            <tr><td>Acciones Cementos Pacasmayo</td><td><span class="bdg bdg-t">Renta variable</span></td><td>S/ 2,760</td><td>S/ 2,760</td><td><span style="color:var(--color-text-tertiary)">S/ 0</span></td><td>0.0%</td><td>1.1%</td><td><span class="bdg bdg-r">En revisión</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ACTIVOS FINANCIEROS -->
+    <div id="view-activos" class="hidden">
+      <div class="sec">
+        <div class="sec-hd"><span class="sec-ttl">Registro de activos financieros</span><span class="sec-bdg">S/ 305,750 total</span></div>
+        <table>
+          <thead><tr><th>Activo</th><th>Categoría</th><th>Valor libro</th><th>Valor razonable</th><th>Vida útil</th><th>Clasificación</th></tr></thead>
+          <tbody>
+            <tr><td>Caja y bancos</td><td>Efectivo</td><td>S/ 110,750</td><td>S/ 110,750</td><td>—</td><td><span class="bdg bdg-b">Nivel 1</span></td></tr>
+            <tr><td>Cuentas por cobrar clientes</td><td>Crédito</td><td>S/ 43,800</td><td>S/ 42,100</td><td>30–90 días</td><td><span class="bdg bdg-b">Nivel 2</span></td></tr>
+            <tr><td>Fondo Mutuo BCP</td><td>Inversión</td><td>S/ 60,000</td><td>S/ 64,800</td><td>Abierto</td><td><span class="bdg bdg-b">Nivel 1</span></td></tr>
+            <tr><td>Bono Credicorp 2027</td><td>Inversión</td><td>S/ 50,000</td><td>S/ 51,500</td><td>2 años</td><td><span class="bdg bdg-a">Nivel 2</span></td></tr>
+            <tr><td>Acciones BVL</td><td>Inversión</td><td>S/ 77,000</td><td>S/ 86,360</td><td>Indefinida</td><td><span class="bdg bdg-b">Nivel 1</span></td></tr>
+            <tr><td>Inmuebles y equipos</td><td>Tangible</td><td>S/ 80,800</td><td>S/ 95,000</td><td>5–20 años</td><td><span class="bdg bdg-gr">Nivel 3</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- VALORACION -->
+    <div id="view-valoracion" class="hidden">
+      <div class="kpi-grid-3">
+        <div class="kpi"><div class="kpi-lbl">Valor contable (book)</div><div class="kpi-val">S/ 165,650</div><div class="kpi-delta" style="color:var(--color-text-tertiary);">Patrimonio neto</div></div>
+        <div class="kpi"><div class="kpi-lbl">Valor DCF estimado</div><div class="kpi-val">S/ 4.2M</div><div class="kpi-delta up">WACC 12% / g 3%</div></div>
+        <div class="kpi"><div class="kpi-lbl">EV / EBITDA</div><div class="kpi-val">10.7x</div><div class="kpi-delta" style="color:var(--color-text-tertiary);">Sector: 8–12x</div></div>
+      </div>
+      <div class="sec">
+        <div class="sec-hd"><span class="sec-ttl">Múltiplos de valoración</span></div>
+        <table>
+          <thead><tr><th>Múltiplo</th><th>Empresa</th><th>Sector Perú</th><th>Latam comparable</th><th>Lectura</th></tr></thead>
+          <tbody>
+            <tr><td>P/E (precio / utilidad)</td><td>14.2x</td><td>12–16x</td><td>13–18x</td><td><span class="bdg bdg-g">En rango</span></td></tr>
+            <tr><td>EV / EBITDA</td><td>10.7x</td><td>8–12x</td><td>9–14x</td><td><span class="bdg bdg-g">En rango</span></td></tr>
+            <tr><td>P/BV (precio / valor libro)</td><td>3.3x</td><td>2–4x</td><td>2.5–5x</td><td><span class="bdg bdg-g">En rango</span></td></tr>
+            <tr><td>EV / Ventas</td><td>5.7x</td><td>4–7x</td><td>5–8x</td><td><span class="bdg bdg-g">En rango</span></td></tr>
+            <tr><td>P/FCF (precio / flujo libre)</td><td>18.4x</td><td>15–22x</td><td>16–25x</td><td><span class="bdg bdg-g">En rango</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="sec">
+        <div class="sec-hd"><span class="sec-ttl">Supuestos DCF</span></div>
+        <table>
+          <thead><tr><th>Parámetro</th><th>Valor</th><th>Notas</th></tr></thead>
+          <tbody>
+            <tr><td>WACC</td><td>12.0%</td><td>Costo capital promedio ponderado</td></tr>
+            <tr><td>Tasa de crecimiento terminal (g)</td><td>3.0%</td><td>Basado en PBI proyectado Perú</td></tr>
+            <tr><td>FCF año 1 proyectado</td><td>S/ 68,000</td><td>Flujo libre de caja</td></tr>
+            <tr><td>Horizonte proyección</td><td>5 años</td><td>2025–2029</td></tr>
+            <tr><td>Valor terminal</td><td>S/ 3.8M</td><td>Método Gordon Growth</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- DEUDA -->
+    <div id="view-deuda" class="hidden">
+      <div class="kpi-grid-3">
+        <div class="kpi"><div class="kpi-lbl">Deuda total</div><div class="kpi-val">S/ 140,100</div><div class="kpi-delta down">Pasivo total</div></div>
+        <div class="kpi"><div class="kpi-lbl">Deuda neta</div><div class="kpi-val">S/ 29,350</div><div class="kpi-delta up">Deuda - Caja</div></div>
+        <div class="kpi"><div class="kpi-lbl">Costo promedio deuda</div><div class="kpi-val">7.8%</div><div class="kpi-delta" style="color:var(--color-text-tertiary);">Pre-tax</div></div>
+      </div>
+      <div class="sec">
+        <div class="sec-hd"><span class="sec-ttl">Detalle de créditos y obligaciones</span></div>
+        <table>
+          <thead><tr><th>Acreedor</th><th>Tipo</th><th>Saldo</th><th>Tasa</th><th>Vence</th><th>Cuota mensual</th><th>Estado</th></tr></thead>
+          <tbody>
+            <tr><td>BCP — Préstamo comercial</td><td><span class="bdg bdg-b">L/Plazo</span></td><td>S/ 85,000</td><td>9.5% TEA</td><td>Dic 2027</td><td>S/ 2,800</td><td><span class="bdg bdg-g">Al día</span></td></tr>
+            <tr><td>Scotiabank — Línea de crédito</td><td><span class="bdg bdg-a">Revolvente</span></td><td>S/ 20,000</td><td>12.0% TEA</td><td>Jun 2025</td><td>S/ 1,800</td><td><span class="bdg bdg-g">Al día</span></td></tr>
+            <tr><td>Leasing vehículo — BBVA</td><td><span class="bdg bdg-gr">Leasing</span></td><td>S/ 18,000</td><td>8.2% TEA</td><td>Ago 2026</td><td>S/ 620</td><td><span class="bdg bdg-g">Al día</span></td></tr>
+            <tr><td>Remuneraciones por pagar</td><td><span class="bdg bdg-gr">C/Plazo</span></td><td>S/ 24,800</td><td>—</td><td>30 Abr</td><td>—</td><td><span class="bdg bdg-a">Pendiente</span></td></tr>
+            <tr><td>Tributos por pagar SUNAT</td><td><span class="bdg bdg-r">Fiscal</span></td><td>S/ 11,665</td><td>—</td><td>20 Abr</td><td>—</td><td><span class="bdg bdg-a">Por pagar</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- CAPITAL -->
+    <div id="view-capital" class="hidden">
+      <div class="sec">
+        <div class="sec-hd"><span class="sec-ttl">Estructura de capital</span></div>
+        <div class="bar-wrap">
+          <div class="bar-row"><div class="bar-lbl">Capital social</div><div class="bar-track"><div class="bar-fill" style="width:73%;background:#378ADD;"></div></div><div class="bar-val">S/ 120,000</div></div>
+          <div class="bar-row"><div class="bar-lbl">Utilidades reten.</div><div class="bar-track"><div class="bar-fill" style="width:28%;background:#1D9E75;"></div></div><div class="bar-val">S/ 45,650</div></div>
+          <div class="bar-row"><div class="bar-lbl">Deuda L/Plazo</div><div class="bar-track"><div class="bar-fill" style="width:52%;background:#EF9F27;"></div></div><div class="bar-val">S/ 85,000</div></div>
+          <div class="bar-row"><div class="bar-lbl">Deuda C/Plazo</div><div class="bar-track"><div class="bar-fill" style="width:34%;background:#E24B4A;"></div></div><div class="bar-val">S/ 55,100</div></div>
+        </div>
+      </div>
+      <div class="sec">
+        <div class="sec-hd"><span class="sec-ttl">Costo de capital (WACC)</span></div>
+        <table>
+          <thead><tr><th>Componente</th><th>Monto</th><th>Peso</th><th>Costo</th><th>Contribución WACC</th></tr></thead>
+          <tbody>
+            <tr><td>Patrimonio (equity)</td><td>S/ 165,650</td><td>54.2%</td><td>14.5%</td><td>7.86%</td></tr>
+            <tr><td>Deuda financiera</td><td>S/ 140,100</td><td>45.8%</td><td>9.2%</td><td>4.22%</td></tr>
+            <tr><td colspan="4" style="font-weight:500;text-align:right;background:var(--color-background-secondary);">WACC total</td><td style="font-weight:500;background:var(--color-background-secondary);">12.08%</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- DIVIDENDOS -->
+    <div id="view-dividendos" class="hidden">
+      <div class="kpi-grid-3">
+        <div class="kpi"><div class="kpi-lbl">Dividendo 2024 pagado</div><div class="kpi-val">S/ 18,000</div><div class="kpi-delta" style="color:var(--color-text-tertiary);">Payout 39.5%</div></div>
+        <div class="kpi"><div class="kpi-lbl">Dividendo 2025 proyect.</div><div class="kpi-val">S/ 22,000</div><div class="kpi-delta up">▲ 22.2% vs 2024</div></div>
+        <div class="kpi"><div class="kpi-lbl">Rendimiento dividendo</div><div class="kpi-val">0.52%</div><div class="kpi-delta" style="color:var(--color-text-tertiary);">Sobre valor empresa</div></div>
+      </div>
+      <div class="sec">
+        <div class="sec-hd"><span class="sec-ttl">Historial de dividendos</span></div>
+        <table>
+          <thead><tr><th>Año</th><th>Utilidad neta</th><th>Dividendo pagado</th><th>Payout ratio</th><th>Utilidades retenidas</th><th>Estado</th></tr></thead>
+          <tbody>
+            <tr><td>2022</td><td>S/ 38,400</td><td>S/ 12,000</td><td>31.2%</td><td>S/ 26,400</td><td><span class="bdg bdg-g">Pagado</span></td></tr>
+            <tr><td>2023</td><td>S/ 42,800</td><td>S/ 14,000</td><td>32.7%</td><td>S/ 28,800</td><td><span class="bdg bdg-g">Pagado</span></td></tr>
+            <tr><td>2024</td><td>S/ 45,600</td><td>S/ 18,000</td><td>39.5%</td><td>S/ 27,600</td><td><span class="bdg bdg-g">Pagado</span></td></tr>
+            <tr><td>2025 (proyect.)</td><td>S/ 56,604</td><td>S/ 22,000</td><td>38.9%</td><td>S/ 34,604</td><td><span class="bdg bdg-a">Pendiente</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- PRESUPUESTO -->
+    <div id="view-presupuesto" class="hidden">
+      <div class="sec">
+        <div class="sec-hd"><span class="sec-ttl">Presupuesto vs real — 2025</span><span class="sec-bdg">Q1 cerrado</span></div>
+        <table>
+          <thead><tr><th>Concepto</th><th>Presupuesto anual</th><th>Real Q1</th><th>Ejecución</th><th>Variación</th><th>Alerta</th></tr></thead>
+          <tbody>
+            <tr><td>Ingresos totales</td><td>S/ 750,000</td><td>S/ 552,960</td><td>73.7%</td><td><span class="up">+S/ 27,960</span></td><td><span class="bdg bdg-g">OK</span></td></tr>
+            <tr><td>Costo de ventas</td><td>S/ 275,000</td><td>S/ 205,200</td><td>74.6%</td><td><span class="down">-S/ 2,050</span></td><td><span class="bdg bdg-a">Revisar</span></td></tr>
+            <tr><td>Gasto de personal</td><td>S/ 100,000</td><td>S/ 74,400</td><td>74.4%</td><td><span class="up">+S/ 0</span></td><td><span class="bdg bdg-g">OK</span></td></tr>
+            <tr><td>Gastos administrativos</td><td>S/ 35,000</td><td>S/ 25,350</td><td>72.4%</td><td><span class="up">+S/ 1,400</span></td><td><span class="bdg bdg-g">OK</span></td></tr>
+            <tr><td>Capex (inversión)</td><td>S/ 50,000</td><td>S/ 12,000</td><td>24.0%</td><td><span class="down">-S/ 5,500</span></td><td><span class="bdg bdg-r">Atrasado</span></td></tr>
+            <tr><td>Pago de deuda</td><td>S/ 40,000</td><td>S/ 15,940</td><td>39.9%</td><td><span class="up">±0</span></td><td><span class="bdg bdg-g">OK</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- PROYECCIONES -->
+    <div id="view-proyecciones" class="hidden">
+      <div class="sec">
+        <div class="sec-hd"><span class="sec-ttl">Proyecciones financieras 2025–2029</span></div>
+        <table>
+          <thead><tr><th>Indicador</th><th>2025E</th><th>2026E</th><th>2027E</th><th>2028E</th><th>2029E</th><th>CAGR</th></tr></thead>
+          <tbody>
+            <tr><td>Ingresos</td><td>S/ 750K</td><td>S/ 843K</td><td>S/ 948K</td><td>S/ 1.07M</td><td>S/ 1.20M</td><td>12.4%</td></tr>
+            <tr><td>EBITDA</td><td>S/ 400K</td><td>S/ 452K</td><td>S/ 511K</td><td>S/ 578K</td><td>S/ 654K</td><td>13.1%</td></tr>
+            <tr><td>Utilidad neta</td><td>S/ 220K</td><td>S/ 252K</td><td>S/ 289K</td><td>S/ 331K</td><td>S/ 380K</td><td>14.7%</td></tr>
+            <tr><td>FCF</td><td>S/ 168K</td><td>S/ 194K</td><td>S/ 224K</td><td>S/ 258K</td><td>S/ 297K</td><td>15.3%</td></tr>
+            <tr><td>Deuda neta</td><td>S/ 29K</td><td>S/ 18K</td><td>S/ 8K</td><td>(S/ 5K)</td><td>(S/ 22K)</td><td>—</td></tr>
+            <tr><td>ROE proyectado</td><td>23.4%</td><td>24.8%</td><td>26.1%</td><td>27.5%</td><td>29.0%</td><td>+5.6pp</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="sec">
+        <div class="sec-hd"><span class="sec-ttl">Escenarios de sensibilidad</span></div>
+        <table>
+          <thead><tr><th>Escenario</th><th>Crecimiento ventas</th><th>Margen EBITDA</th><th>Utilidad 2025</th><th>EV estimado</th></tr></thead>
+          <tbody>
+            <tr><td><span class="bdg bdg-r">Pesimista</span></td><td>5%</td><td>45%</td><td>S/ 168K</td><td>S/ 3.1M</td></tr>
+            <tr><td><span class="bdg bdg-a">Base</span></td><td>12%</td><td>53%</td><td>S/ 220K</td><td>S/ 4.2M</td></tr>
+            <tr><td><span class="bdg bdg-g">Optimista</span></td><td>20%</td><td>60%</td><td>S/ 290K</td><td>S/ 5.8M</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- RIESGOS -->
+    <div id="view-riesgos" class="hidden">
+      <div class="sec">
+        <div class="sec-hd"><span class="sec-ttl">Mapa de riesgos financieros</span></div>
+        <table>
+          <thead><tr><th>Riesgo</th><th>Categoría</th><th>Probabilidad</th><th>Impacto</th><th>Nivel</th><th>Mitigación</th></tr></thead>
+          <tbody>
+            <tr><td>Alza de tasas de interés</td><td>Mercado</td><td>Alta</td><td>Medio</td><td><span class="bdg bdg-a">Medio</span></td><td>Deuda a tasa fija</td></tr>
+            <tr><td>Depreciación del sol (PEN)</td><td>Cambiario</td><td>Media</td><td>Medio</td><td><span class="bdg bdg-a">Medio</span></td><td>Cobertura forward</td></tr>
+            <tr><td>Concentración de clientes</td><td>Crédito</td><td>Media</td><td>Alto</td><td><span class="bdg bdg-r">Alto</span></td><td>Diversificar cartera</td></tr>
+            <tr><td>Caída de demanda sectorial</td><td>Operativo</td><td>Baja</td><td>Alto</td><td><span class="bdg bdg-a">Medio</span></td><td>Diversificación productos</td></tr>
+            <tr><td>Incumplimiento de covenants</td><td>Deuda</td><td>Baja</td><td>Muy alto</td><td><span class="bdg bdg-g">Bajo</span></td><td>Monitoreo mensual KPIs</td></tr>
+            <tr><td>Fraude / control interno</td><td>Operativo</td><td>Baja</td><td>Alto</td><td><span class="bdg bdg-g">Bajo</span></td><td>Auditoría interna</td></tr>
+            <tr><td>Cambios tributarios SUNAT</td><td>Regulatorio</td><td>Media</td><td>Medio</td><td><span class="bdg bdg-a">Medio</span></td><td>Asesoría tributaria</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</div>
+</div>
+
+<script>
+const pages={
+  dashboard:{title:'Dashboard financiero',crumb:'Finanzas / Inicio'},
+  kpis:{title:'Indicadores KPI',crumb:'Finanzas / KPIs'},
+  ratios:{title:'Ratios financieros',crumb:'Finanzas / Ratios'},
+  portafolio:{title:'Portafolio de inversiones',crumb:'Inversiones / Portafolio'},
+  activos:{title:'Activos financieros',crumb:'Inversiones / Activos'},
+  valoracion:{title:'Valoración de empresa',crumb:'Inversiones / Valoración'},
+  deuda:{title:'Deuda y créditos',crumb:'Deuda y Capital / Deuda'},
+  capital:{title:'Estructura de capital',crumb:'Deuda y Capital / Capital'},
+  dividendos:{title:'Dividendos',crumb:'Deuda y Capital / Dividendos'},
+  presupuesto:{title:'Presupuesto',crumb:'Planeación / Presupuesto'},
+  proyecciones:{title:'Proyecciones financieras',crumb:'Planeación / Proyecciones'},
+  riesgos:{title:'Gestión de riesgos',crumb:'Planeación / Riesgos'}
+};
+let cur='dashboard';
+function nav(el,page){
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('view-'+cur).classList.add('hidden');
+  document.getElementById('view-'+page).classList.remove('hidden');
+  cur=page;
+  document.getElementById('page-title').textContent=pages[page].title;
+  document.getElementById('page-crumb').textContent=pages[page].crumb;
+}
+</script>

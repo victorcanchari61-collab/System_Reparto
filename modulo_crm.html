@@ -1,0 +1,511 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+.app{display:flex;height:100vh;min-height:640px;background:var(--color-background-tertiary);}
+.sidebar{width:232px;min-width:232px;background:var(--color-background-primary);border-right:0.5px solid var(--color-border-tertiary);display:flex;flex-direction:column;overflow-y:auto;}
+.sb-head{padding:18px 16px 12px;border-bottom:0.5px solid var(--color-border-tertiary);}
+.sb-logo{font-size:15px;font-weight:500;color:var(--color-text-primary);}
+.sb-sub{font-size:12px;color:var(--color-text-secondary);margin-top:2px;}
+.nav-sec{padding:10px 0 2px;}
+.nav-lbl{font-size:10px;font-weight:500;color:var(--color-text-tertiary);text-transform:uppercase;letter-spacing:.08em;padding:0 16px;margin-bottom:4px;}
+.nav-item{display:flex;align-items:center;gap:10px;padding:7px 16px;cursor:pointer;font-size:13px;color:var(--color-text-secondary);border-left:2px solid transparent;transition:all .15s;}
+.nav-item:hover{background:var(--color-background-secondary);color:var(--color-text-primary);}
+.nav-item.active{background:#FBEAF0;color:#993556;border-left-color:#D4537E;font-weight:500;}
+.nav-icon{font-size:13px;width:16px;text-align:center;}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+.topbar{background:var(--color-background-primary);border-bottom:0.5px solid var(--color-border-tertiary);padding:11px 22px;display:flex;align-items:center;justify-content:space-between;}
+.pg-title{font-size:16px;font-weight:500;color:var(--color-text-primary);}
+.pg-crumb{font-size:12px;color:var(--color-text-tertiary);margin-top:1px;}
+.tb-act{display:flex;gap:8px;align-items:center;}
+.btn{padding:6px 14px;border-radius:var(--border-radius-md);font-size:13px;cursor:pointer;border:0.5px solid var(--color-border-secondary);background:var(--color-background-primary);color:var(--color-text-primary);}
+.btn-p{background:#993556;color:#fff;border-color:#993556;}
+.srch{padding:6px 12px;border-radius:var(--border-radius-md);font-size:13px;border:0.5px solid var(--color-border-secondary);background:var(--color-background-secondary);color:var(--color-text-primary);width:170px;}
+.content{flex:1;overflow-y:auto;padding:22px;}
+.kpi4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:20px;}
+.kpi3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:20px;}
+.kpi{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:14px;}
+.kl{font-size:12px;color:var(--color-text-secondary);margin-bottom:5px;}
+.kv{font-size:21px;font-weight:500;color:var(--color-text-primary);}
+.kd{font-size:11px;margin-top:3px;}
+.up{color:#3B6D11;}.dn{color:#A32D2D;}.nu{color:var(--color-text-tertiary);}
+.sec{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);margin-bottom:18px;overflow:hidden;}
+.sh{padding:13px 18px;border-bottom:0.5px solid var(--color-border-tertiary);display:flex;align-items:center;justify-content:space-between;gap:8px;}
+.st{font-size:14px;font-weight:500;color:var(--color-text-primary);}
+.sb{font-size:11px;padding:2px 10px;border-radius:99px;background:#FBEAF0;color:#993556;white-space:nowrap;}
+table{width:100%;border-collapse:collapse;font-size:13px;}
+th{text-align:left;font-size:11px;font-weight:500;color:var(--color-text-tertiary);text-transform:uppercase;letter-spacing:.06em;padding:9px 18px;border-bottom:0.5px solid var(--color-border-tertiary);}
+td{padding:10px 18px;border-bottom:0.5px solid var(--color-border-tertiary);color:var(--color-text-primary);}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:var(--color-background-secondary);}
+.bdg{display:inline-block;font-size:11px;padding:2px 8px;border-radius:99px;}
+.bg{background:#EAF3DE;color:#3B6D11;}
+.ba{background:#FAEEDA;color:#854F0B;}
+.br{background:#FCEBEB;color:#A32D2D;}
+.bb{background:#E6F1FB;color:#185FA5;}
+.bgr{background:#F1EFE8;color:#5F5E5A;}
+.bt{background:#E1F5EE;color:#0F6E56;}
+.bp{background:#FBEAF0;color:#993556;}
+.bpu{background:#EEEDFE;color:#534AB7;}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:18px;}
+.pipe-col{flex:1;min-width:0;}
+.pipe-wrap{display:flex;gap:10px;padding:16px 18px;overflow-x:auto;}
+.pipe-stage{flex:0 0 140px;background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:10px;}
+.pipe-hd{font-size:11px;font-weight:500;color:var(--color-text-secondary);margin-bottom:8px;display:flex;justify-content:space-between;}
+.pipe-card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:8px 10px;margin-bottom:6px;}
+.pipe-nm{font-size:12px;font-weight:500;color:var(--color-text-primary);}
+.pipe-val{font-size:11px;color:var(--color-text-secondary);margin-top:2px;}
+.pipe-prob{font-size:10px;color:var(--color-text-tertiary);margin-top:2px;}
+.avt{width:32px;height:32px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;flex-shrink:0;}
+.prog-track{height:5px;background:var(--color-background-secondary);border-radius:3px;overflow:hidden;margin-top:4px;}
+.prog-fill{height:100%;border-radius:3px;}
+.tl-row{display:flex;gap:12px;padding:11px 18px;border-bottom:0.5px solid var(--color-border-tertiary);align-items:flex-start;}
+.tl-row:last-child{border-bottom:none;}
+.tl-dot{width:8px;height:8px;border-radius:50%;margin-top:5px;flex-shrink:0;}
+.tl-b{flex:1;}
+.tl-t{font-size:13px;color:var(--color-text-primary);font-weight:500;}
+.tl-s{font-size:12px;color:var(--color-text-secondary);margin-top:1px;}
+.tl-d{font-size:11px;color:var(--color-text-tertiary);margin-top:1px;}
+.star{color:#BA7517;}
+.hidden{display:none;}
+</style>
+
+<div class="app">
+<div class="sidebar">
+  <div class="sb-head">
+    <div class="sb-logo">CRMCloud</div>
+    <div class="sb-sub">Ventas + Servicio al cliente</div>
+  </div>
+  <div class="nav-sec">
+    <div class="nav-lbl">General</div>
+    <div class="nav-item active" onclick="nav(this,'dashboard')"><span class="nav-icon">◼</span> Dashboard</div>
+  </div>
+  <div class="nav-sec">
+    <div class="nav-lbl">Ventas</div>
+    <div class="nav-item" onclick="nav(this,'pipeline')"><span class="nav-icon">▷</span> Pipeline</div>
+    <div class="nav-item" onclick="nav(this,'clientes')"><span class="nav-icon">●</span> Clientes</div>
+    <div class="nav-item" onclick="nav(this,'contactos')"><span class="nav-icon">◑</span> Contactos</div>
+    <div class="nav-item" onclick="nav(this,'oportunidades')"><span class="nav-icon">◈</span> Oportunidades</div>
+    <div class="nav-item" onclick="nav(this,'cotizaciones')"><span class="nav-icon">▤</span> Cotizaciones</div>
+    <div class="nav-item" onclick="nav(this,'pedidos')"><span class="nav-icon">◧</span> Pedidos</div>
+    <div class="nav-item" onclick="nav(this,'vendedores')"><span class="nav-icon">◉</span> Equipo de ventas</div>
+    <div class="nav-item" onclick="nav(this,'comisiones')"><span class="nav-icon">▦</span> Comisiones</div>
+  </div>
+  <div class="nav-sec">
+    <div class="nav-lbl">Servicio al cliente</div>
+    <div class="nav-item" onclick="nav(this,'tickets')"><span class="nav-icon">☰</span> Tickets / Casos</div>
+    <div class="nav-item" onclick="nav(this,'sla')"><span class="nav-icon">⇄</span> SLA y tiempos</div>
+    <div class="nav-item" onclick="nav(this,'kb')"><span class="nav-icon">✎</span> Base de conocimiento</div>
+    <div class="nav-item" onclick="nav(this,'nps')"><span class="nav-icon">▧</span> NPS / Satisfacción</div>
+  </div>
+  <div class="nav-sec">
+    <div class="nav-lbl">Marketing</div>
+    <div class="nav-item" onclick="nav(this,'campanas')"><span class="nav-icon">▶</span> Campañas</div>
+    <div class="nav-item" onclick="nav(this,'leads')"><span class="nav-icon">◆</span> Leads</div>
+  </div>
+  <div class="nav-sec">
+    <div class="nav-lbl">Reportes</div>
+    <div class="nav-item" onclick="nav(this,'forecast')"><span class="nav-icon">◑</span> Forecast ventas</div>
+    <div class="nav-item" onclick="nav(this,'actividades')"><span class="nav-icon">▷</span> Actividades</div>
+  </div>
+</div>
+
+<div class="main">
+  <div class="topbar">
+    <div>
+      <div class="pg-title" id="pg-title">Dashboard CRM</div>
+      <div class="pg-crumb" id="pg-crumb">CRM / Inicio</div>
+    </div>
+    <div class="tb-act">
+      <input class="srch" type="text" placeholder="Buscar cliente, ticket...">
+      <button class="btn">Exportar</button>
+      <button class="btn btn-p">+ Nuevo</button>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- DASHBOARD -->
+    <div id="view-dashboard">
+      <div class="kpi4">
+        <div class="kpi"><div class="kl">Ingresos del mes</div><div class="kv">S/ 184,320</div><div class="kd up">▲ 12.4% vs mes ant.</div></div>
+        <div class="kpi"><div class="kl">Oportunidades abiertas</div><div class="kv">38</div><div class="kd up">▲ 5 nuevas esta semana</div></div>
+        <div class="kpi"><div class="kl">Tickets abiertos</div><div class="kv">17</div><div class="kd dn">3 vencen hoy</div></div>
+        <div class="kpi"><div class="kl">NPS promedio</div><div class="kv">72</div><div class="kd up">▲ +4 vs trimestre ant.</div></div>
+      </div>
+      <div class="two">
+        <div class="sec">
+          <div class="sh"><span class="st">Oportunidades por etapa</span><span class="sb">Pipeline activo</span></div>
+          <div style="padding:14px 18px;">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;"><div style="font-size:12px;color:var(--color-text-secondary);width:100px;">Prospecto</div><div style="flex:1;height:7px;background:var(--color-background-secondary);border-radius:3px;overflow:hidden;"><div style="width:90%;height:100%;border-radius:3px;background:#7F77DD;"></div></div><div style="font-size:12px;width:30px;color:var(--color-text-primary);">12</div></div>
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;"><div style="font-size:12px;color:var(--color-text-secondary);width:100px;">Calificado</div><div style="flex:1;height:7px;background:var(--color-background-secondary);border-radius:3px;overflow:hidden;"><div style="width:70%;height:100%;border-radius:3px;background:#D4537E;"></div></div><div style="font-size:12px;width:30px;color:var(--color-text-primary);">9</div></div>
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;"><div style="font-size:12px;color:var(--color-text-secondary);width:100px;">Propuesta</div><div style="flex:1;height:7px;background:var(--color-background-secondary);border-radius:3px;overflow:hidden;"><div style="width:55%;height:100%;border-radius:3px;background:#378ADD;"></div></div><div style="font-size:12px;width:30px;color:var(--color-text-primary);">7</div></div>
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;"><div style="font-size:12px;color:var(--color-text-secondary);width:100px;">Negociación</div><div style="flex:1;height:7px;background:var(--color-background-secondary);border-radius:3px;overflow:hidden;"><div style="width:40%;height:100%;border-radius:3px;background:#EF9F27;"></div></div><div style="font-size:12px;width:30px;color:var(--color-text-primary);">5</div></div>
+            <div style="display:flex;align-items:center;gap:10px;"><div style="font-size:12px;color:var(--color-text-secondary);width:100px;">Cierre</div><div style="flex:1;height:7px;background:var(--color-background-secondary);border-radius:3px;overflow:hidden;"><div style="width:40%;height:100%;border-radius:3px;background:#1D9E75;"></div></div><div style="font-size:12px;width:30px;color:var(--color-text-primary);">5</div></div>
+          </div>
+        </div>
+        <div class="sec">
+          <div class="sh"><span class="st">Tickets por estado</span></div>
+          <div class="tl-row"><div class="tl-dot" style="background:#A32D2D;"></div><div class="tl-b"><div class="tl-t">Error en facturación — ACME Corp</div><div class="tl-s">Prioridad alta · Asignado: Ana Torres</div><div class="tl-d">Vence hoy 17:00 · Ticket #1042</div></div><span class="bdg br">Urgente</span></div>
+          <div class="tl-row"><div class="tl-dot" style="background:#BA7517;"></div><div class="tl-b"><div class="tl-t">Solicitud de devolución — Rímac</div><div class="tl-s">Prioridad media · Asignado: Luis Pinto</div><div class="tl-d">Vence mañana · Ticket #1039</div></div><span class="bdg ba">En proceso</span></div>
+          <div class="tl-row"><div class="tl-dot" style="background:#185FA5;"></div><div class="tl-b"><div class="tl-t">Consulta técnica — Grupo Breca</div><div class="tl-s">Prioridad baja · Sin asignar</div><div class="tl-d">Abierto hace 2 días · Ticket #1036</div></div><span class="bdg bb">Nuevo</span></div>
+          <div class="tl-row"><div class="tl-dot" style="background:#3B6D11;"></div><div class="tl-b"><div class="tl-t">Cambio de datos — Supermercados Peruanos</div><div class="tl-s">Prioridad baja · Asignado: Ana Torres</div><div class="tl-d">Resuelto hace 1 hora · Ticket #1033</div></div><span class="bdg bg">Resuelto</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PIPELINE -->
+    <div id="view-pipeline" class="hidden">
+      <div class="kpi4">
+        <div class="kpi"><div class="kl">Valor total pipeline</div><div class="kv">S/ 1.24M</div><div class="kd up">▲ 8% vs mes ant.</div></div>
+        <div class="kpi"><div class="kl">Valor ponderado</div><div class="kv">S/ 486,000</div><div class="kd nu">Por probabilidad</div></div>
+        <div class="kpi"><div class="kl">Tasa de conversión</div><div class="kv">28.4%</div><div class="kd up">▲ 3.1 pp</div></div>
+        <div class="kpi"><div class="kl">Ciclo de venta prom.</div><div class="kv">34 días</div><div class="kd up">▼ 4 días mejor</div></div>
+      </div>
+      <div class="sec">
+        <div class="sh"><span class="st">Pipeline — vista kanban</span><span class="sb">38 oportunidades</span></div>
+        <div class="pipe-wrap">
+          <div class="pipe-stage"><div class="pipe-hd"><span>Prospecto</span><span class="bdg bpu">12</span></div>
+            <div class="pipe-card"><div class="pipe-nm">Clínica San Pablo</div><div class="pipe-val">S/ 48,000</div><div class="pipe-prob">Prob. 20%</div></div>
+            <div class="pipe-card"><div class="pipe-nm">Cencosud Perú</div><div class="pipe-val">S/ 120,000</div><div class="pipe-prob">Prob. 15%</div></div>
+            <div class="pipe-card"><div class="pipe-nm">BBVA Seguros</div><div class="pipe-val">S/ 65,000</div><div class="pipe-prob">Prob. 20%</div></div>
+          </div>
+          <div class="pipe-stage"><div class="pipe-hd"><span>Calificado</span><span class="bdg bp">9</span></div>
+            <div class="pipe-card"><div class="pipe-nm">Alicorp S.A.A.</div><div class="pipe-val">S/ 95,000</div><div class="pipe-prob">Prob. 40%</div></div>
+            <div class="pipe-card"><div class="pipe-nm">Tottus Perú</div><div class="pipe-val">S/ 72,000</div><div class="pipe-prob">Prob. 35%</div></div>
+          </div>
+          <div class="pipe-stage"><div class="pipe-hd"><span>Propuesta</span><span class="bdg bb">7</span></div>
+            <div class="pipe-card"><div class="pipe-nm">Grupo Breca</div><div class="pipe-val">S/ 180,000</div><div class="pipe-prob">Prob. 60%</div></div>
+            <div class="pipe-card"><div class="pipe-nm">InRetail Perú</div><div class="pipe-val">S/ 95,000</div><div class="pipe-prob">Prob. 55%</div></div>
+          </div>
+          <div class="pipe-stage"><div class="pipe-hd"><span>Negociación</span><span class="bdg ba">5</span></div>
+            <div class="pipe-card"><div class="pipe-nm">Rímac Seguros</div><div class="pipe-val">S/ 220,000</div><div class="pipe-prob">Prob. 75%</div></div>
+            <div class="pipe-card"><div class="pipe-nm">Ferreyros SAC</div><div class="pipe-val">S/ 88,000</div><div class="pipe-prob">Prob. 70%</div></div>
+          </div>
+          <div class="pipe-stage"><div class="pipe-hd"><span>Cierre</span><span class="bdg bg">5</span></div>
+            <div class="pipe-card"><div class="pipe-nm">Anglo Americana</div><div class="pipe-val">S/ 145,000</div><div class="pipe-prob">Prob. 90%</div></div>
+            <div class="pipe-card"><div class="pipe-nm">Supermercados Peru</div><div class="pipe-val">S/ 112,000</div><div class="pipe-prob">Prob. 85%</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CLIENTES -->
+    <div id="view-clientes" class="hidden">
+      <div class="sec">
+        <div class="sh"><span class="st">Cartera de clientes</span><span class="sb">84 activos</span></div>
+        <table>
+          <thead><tr><th>Cliente</th><th>RUC</th><th>Segmento</th><th>Ejecutivo</th><th>Facturación anual</th><th>Últ. compra</th><th>Estado</th></tr></thead>
+          <tbody>
+            <tr><td>Rímac Seguros S.A.</td><td>20331198600</td><td><span class="bdg bpu">Enterprise</span></td><td>Carlos Quispe</td><td>S/ 284,400</td><td>31/03/25</td><td><span class="bdg bg">Activo</span></td></tr>
+            <tr><td>Clínica Anglo Americana</td><td>20100154308</td><td><span class="bdg bpu">Enterprise</span></td><td>Ana Torres</td><td>S/ 198,200</td><td>28/03/25</td><td><span class="bdg bg">Activo</span></td></tr>
+            <tr><td>Supermercados Peruanos</td><td>20100070970</td><td><span class="bdg bp">Mid-market</span></td><td>Luis Pinto</td><td>S/ 142,500</td><td>25/03/25</td><td><span class="bdg bg">Activo</span></td></tr>
+            <tr><td>Grupo Breca S.A.C.</td><td>20101672561</td><td><span class="bdg bpu">Enterprise</span></td><td>Carlos Quispe</td><td>S/ 120,000</td><td>20/03/25</td><td><span class="bdg bg">Activo</span></td></tr>
+            <tr><td>InRetail Perú SAC</td><td>20521436784</td><td><span class="bdg bp">Mid-market</span></td><td>Ana Torres</td><td>S/ 98,400</td><td>18/03/25</td><td><span class="bdg bg">Activo</span></td></tr>
+            <tr><td>Alicorp S.A.A.</td><td>20100055237</td><td><span class="bdg bpu">Enterprise</span></td><td>Luis Pinto</td><td>S/ 86,200</td><td>12/03/25</td><td><span class="bdg bg">Activo</span></td></tr>
+            <tr><td>Ferreyros SAC</td><td>20100020136</td><td><span class="bdg bp">Mid-market</span></td><td>Carlos Quispe</td><td>S/ 54,000</td><td>05/03/25</td><td><span class="bdg ba">En riesgo</span></td></tr>
+            <tr><td>Importaciones Del Sol</td><td>20456789123</td><td><span class="bdg bgr">SMB</span></td><td>Luis Pinto</td><td>S/ 28,400</td><td>15/02/25</td><td><span class="bdg ba">Inactivo 45d</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- CONTACTOS -->
+    <div id="view-contactos" class="hidden">
+      <div class="sec">
+        <div class="sh"><span class="st">Contactos del CRM</span><span class="sb">218 registros</span></div>
+        <table>
+          <thead><tr><th>Nombre</th><th>Cargo</th><th>Empresa</th><th>Email</th><th>Teléfono</th><th>Ejecutivo</th><th>Estado</span></th></tr></thead>
+          <tbody>
+            <tr><td><div style="display:flex;align-items:center;gap:8px;"><div class="avt" style="background:#EEEDFE;color:#534AB7;">JR</div>Jorge Ramírez</div></td><td>Gerente de Compras</td><td>Rímac Seguros</td><td>j.ramirez@rimac.pe</td><td>999-110-001</td><td>Carlos Q.</td><td><span class="bdg bg">Activo</span></td></tr>
+            <tr><td><div style="display:flex;align-items:center;gap:8px;"><div class="avt" style="background:#FBEAF0;color:#993556;">ML</div>María Llanos</div></td><td>Dir. Finanzas</td><td>Clínica Anglo</td><td>m.llanos@angloamericana.pe</td><td>999-220-002</td><td>Ana T.</td><td><span class="bdg bg">Activo</span></td></tr>
+            <tr><td><div style="display:flex;align-items:center;gap:8px;"><div class="avt" style="background:#E6F1FB;color:#185FA5;">PV</div>Pedro Vásquez</div></td><td>Jefe de Logística</td><td>Supermercados Peruanos</td><td>p.vasquez@spsa.pe</td><td>999-330-003</td><td>Luis P.</td><td><span class="bdg bg">Activo</span></td></tr>
+            <tr><td><div style="display:flex;align-items:center;gap:8px;"><div class="avt" style="background:#E1F5EE;color:#0F6E56;">CG</div>Carmen García</div></td><td>VP Comercial</td><td>Grupo Breca</td><td>c.garcia@breca.pe</td><td>999-440-004</td><td>Carlos Q.</td><td><span class="bdg bg">Activo</span></td></tr>
+            <tr><td><div style="display:flex;align-items:center;gap:8px;"><div class="avt" style="background:#FAEEDA;color:#854F0B;">RT</div>Roberto Torres</div></td><td>Gerente General</td><td>Ferreyros SAC</td><td>r.torres@ferreyros.pe</td><td>999-550-005</td><td>Carlos Q.</td><td><span class="bdg ba">Sin contacto 30d</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- OPORTUNIDADES -->
+    <div id="view-oportunidades" class="hidden">
+      <div class="sec">
+        <div class="sh"><span class="st">Oportunidades de venta</span><span class="sb">38 abiertas</span></div>
+        <table>
+          <thead><tr><th>Oportunidad</th><th>Cliente</th><th>Etapa</th><th>Valor</th><th>Prob.</th><th>Val. ponderado</th><th>Cierre est.</th><th>Ejecutivo</th></tr></thead>
+          <tbody>
+            <tr><td>Renovación contrato anual</td><td>Rímac Seguros</td><td><span class="bdg ba">Negociación</span></td><td>S/ 220,000</td><td>75%</td><td>S/ 165,000</td><td>15/04/25</td><td>Carlos Q.</td></tr>
+            <tr><td>Expansión línea premium</td><td>Anglo Americana</td><td><span class="bdg bg">Cierre</span></td><td>S/ 145,000</td><td>90%</td><td>S/ 130,500</td><td>08/04/25</td><td>Ana T.</td></tr>
+            <tr><td>Nuevo contrato distribución</td><td>Grupo Breca</td><td><span class="bdg bb">Propuesta</span></td><td>S/ 180,000</td><td>60%</td><td>S/ 108,000</td><td>30/04/25</td><td>Carlos Q.</td></tr>
+            <tr><td>Ampliar cobertura norte</td><td>Supermercados Peru</td><td><span class="bdg bg">Cierre</span></td><td>S/ 112,000</td><td>85%</td><td>S/ 95,200</td><td>10/04/25</td><td>Luis P.</td></tr>
+            <tr><td>Proyecto transformación</td><td>Alicorp S.A.A.</td><td><span class="bdg bp">Calificado</span></td><td>S/ 95,000</td><td>40%</td><td>S/ 38,000</td><td>20/05/25</td><td>Luis P.</td></tr>
+            <tr><td>Piloto productos limpios</td><td>InRetail Perú</td><td><span class="bdg bb">Propuesta</span></td><td>S/ 95,000</td><td>55%</td><td>S/ 52,250</td><td>15/05/25</td><td>Ana T.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- COTIZACIONES -->
+    <div id="view-cotizaciones" class="hidden">
+      <div class="sec">
+        <div class="sh"><span class="st">Cotizaciones emitidas</span><span class="sb">22 activas</span></div>
+        <table>
+          <thead><tr><th>N° cotización</th><th>Cliente</th><th>Fecha</th><th>Vence</th><th>Monto</th><th>Descuento</th><th>Total neto</th><th>Estado</th></tr></thead>
+          <tbody>
+            <tr><td>COT-2025-088</td><td>Rímac Seguros</td><td>28/03/25</td><td>12/04/25</td><td>S/ 220,000</td><td>5%</td><td>S/ 209,000</td><td><span class="bdg ba">En revisión</span></td></tr>
+            <tr><td>COT-2025-089</td><td>Anglo Americana</td><td>29/03/25</td><td>13/04/25</td><td>S/ 145,000</td><td>0%</td><td>S/ 145,000</td><td><span class="bdg bg">Aceptada</span></td></tr>
+            <tr><td>COT-2025-090</td><td>Grupo Breca</td><td>30/03/25</td><td>14/04/25</td><td>S/ 180,000</td><td>8%</td><td>S/ 165,600</td><td><span class="bdg ba">Enviada</span></td></tr>
+            <tr><td>COT-2025-091</td><td>InRetail Perú</td><td>31/03/25</td><td>15/04/25</td><td>S/ 95,000</td><td>3%</td><td>S/ 92,150</td><td><span class="bdg bb">Borrador</span></td></tr>
+            <tr><td>COT-2025-085</td><td>Tottus Perú</td><td>20/03/25</td><td>04/04/25</td><td>S/ 72,000</td><td>10%</td><td>S/ 64,800</td><td><span class="bdg br">Vencida</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- PEDIDOS -->
+    <div id="view-pedidos" class="hidden">
+      <div class="kpi4">
+        <div class="kpi"><div class="kl">Pedidos del mes</div><div class="kv">64</div><div class="kd up">▲ 9 vs mes ant.</div></div>
+        <div class="kpi"><div class="kl">Valor total pedidos</div><div class="kv">S/ 184,320</div><div class="kd up">▲ 12.4%</div></div>
+        <div class="kpi"><div class="kl">Ticket promedio</div><div class="kv">S/ 2,880</div><div class="kd up">▲ S/ 240</div></div>
+        <div class="kpi"><div class="kl">Pedidos pendientes</div><div class="kv">8</div><div class="kd nu">Por despachar</div></div>
+      </div>
+      <div class="sec">
+        <div class="sh"><span class="st">Pedidos de venta</span></div>
+        <table>
+          <thead><tr><th>N° pedido</th><th>Cliente</th><th>Fecha</th><th>Productos</th><th>Total</th><th>Método pago</th><th>Estado</th></tr></thead>
+          <tbody>
+            <tr><td>PED-2025-234</td><td>Rímac Seguros</td><td>31/03/25</td><td>3 ítems</td><td>S/ 18,400</td><td>Transferencia</td><td><span class="bdg bg">Entregado</span></td></tr>
+            <tr><td>PED-2025-235</td><td>Anglo Americana</td><td>30/03/25</td><td>5 ítems</td><td>S/ 22,100</td><td>Crédito 30d</td><td><span class="bdg bg">Entregado</span></td></tr>
+            <tr><td>PED-2025-236</td><td>Supermercados Peru</td><td>29/03/25</td><td>12 ítems</td><td>S/ 12,750</td><td>Crédito 30d</td><td><span class="bdg ba">En despacho</span></td></tr>
+            <tr><td>PED-2025-237</td><td>Grupo Breca</td><td>28/03/25</td><td>2 ítems</td><td>S/ 9,300</td><td>Transferencia</td><td><span class="bdg ba">En despacho</span></td></tr>
+            <tr><td>PED-2025-238</td><td>Alicorp S.A.A.</td><td>25/03/25</td><td>8 ítems</td><td>S/ 14,200</td><td>Crédito 45d</td><td><span class="bdg bb">Pendiente pago</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- VENDEDORES -->
+    <div id="view-vendedores" class="hidden">
+      <div class="sec">
+        <div class="sh"><span class="st">Equipo de ventas — rendimiento</span><span class="sb">Marzo 2025</span></div>
+        <table>
+          <thead><tr><th>Vendedor</th><th>Zona</th><th>Clientes</th><th>Oportunidades</th><th>Ventas mes</th><th>Meta mes</th><th>Cumplimiento</th><th>Estado</th></tr></thead>
+          <tbody>
+            <tr><td><div style="display:flex;align-items:center;gap:8px;"><div class="avt" style="background:#EEEDFE;color:#534AB7;">CQ</div>Carlos Quispe</div></td><td>Lima Norte</td><td>28</td><td>14</td><td>S/ 72,400</td><td>S/ 65,000</td><td><div><span style="font-size:12px;color:#3B6D11;">111%</span><div class="prog-track"><div class="prog-fill" style="width:100%;background:#1D9E75;"></div></div></div></td><td><span class="bdg bg">Sobre meta</span></td></tr>
+            <tr><td><div style="display:flex;align-items:center;gap:8px;"><div class="avt" style="background:#FBEAF0;color:#993556;">AT</div>Ana Torres</div></td><td>Lima Sur</td><td>32</td><td>16</td><td>S/ 68,200</td><td>S/ 70,000</td><td><div><span style="font-size:12px;color:#854F0B;">97%</span><div class="prog-track"><div class="prog-fill" style="width:97%;background:#EF9F27;"></div></div></div></td><td><span class="bdg ba">Cerca meta</span></td></tr>
+            <tr><td><div style="display:flex;align-items:center;gap:8px;"><div class="avt" style="background:#E6F1FB;color:#185FA5;">LP</div>Luis Pinto</div></td><td>Lima Centro</td><td>24</td><td>8</td><td>S/ 43,720</td><td>S/ 55,000</td><td><div><span style="font-size:12px;color:#A32D2D;">80%</span><div class="prog-track"><div class="prog-fill" style="width:80%;background:#E24B4A;"></div></div></div></td><td><span class="bdg br">Bajo meta</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- COMISIONES -->
+    <div id="view-comisiones" class="hidden">
+      <div class="sec">
+        <div class="sh"><span class="st">Liquidación de comisiones — Marzo 2025</span></div>
+        <table>
+          <thead><tr><th>Vendedor</th><th>Ventas base</th><th>% comisión</th><th>Comisión base</th><th>Bono meta</th><th>Total comisión</th><th>Estado</th></tr></thead>
+          <tbody>
+            <tr><td>Carlos Quispe</td><td>S/ 72,400</td><td>4%</td><td>S/ 2,896</td><td>S/ 500</td><td>S/ 3,396</td><td><span class="bdg bg">Aprobado</span></td></tr>
+            <tr><td>Ana Torres</td><td>S/ 68,200</td><td>4%</td><td>S/ 2,728</td><td>S/ 0</td><td>S/ 2,728</td><td><span class="bdg ba">Pendiente</span></td></tr>
+            <tr><td>Luis Pinto</td><td>S/ 43,720</td><td>3%</td><td>S/ 1,312</td><td>S/ 0</td><td>S/ 1,312</td><td><span class="bdg ba">Pendiente</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- TICKETS -->
+    <div id="view-tickets" class="hidden">
+      <div class="kpi4">
+        <div class="kpi"><div class="kl">Tickets abiertos</div><div class="kv">17</div><div class="kd dn">3 vencen hoy</div></div>
+        <div class="kpi"><div class="kl">Tiempo resp. prom.</div><div class="kv">3.2 h</div><div class="kd up">▼ SLA: 4h</div></div>
+        <div class="kpi"><div class="kl">Resueltos este mes</div><div class="kv">84</div><div class="kd up">▲ 12 vs mes ant.</div></div>
+        <div class="kpi"><div class="kl">Tasa resolución 1er cont.</div><div class="kv">68%</div><div class="kd up">▲ 5pp</div></div>
+      </div>
+      <div class="sec">
+        <div class="sh"><span class="st">Tickets y casos de soporte</span></div>
+        <table>
+          <thead><tr><th>Ticket</th><th>Cliente</th><th>Asunto</th><th>Categoría</th><th>Prioridad</th><th>Agente</th><th>Creado</th><th>Estado</th></tr></thead>
+          <tbody>
+            <tr><td>#1042</td><td>ACME Corp</td><td>Error en facturación</td><td><span class="bdg ba">Billing</span></td><td><span class="bdg br">Alta</span></td><td>Ana Torres</td><td>Hoy 09:10</td><td><span class="bdg ba">En proceso</span></td></tr>
+            <tr><td>#1041</td><td>Rímac Seguros</td><td>Problema de acceso al portal</td><td><span class="bdg bb">Técnico</span></td><td><span class="bdg br">Alta</span></td><td>Carlos Q.</td><td>Hoy 08:30</td><td><span class="bdg bg">Resuelto</span></td></tr>
+            <tr><td>#1040</td><td>Grupo Breca</td><td>Retraso en entrega pedido</td><td><span class="bdg bp">Logística</span></td><td><span class="bdg ba">Media</span></td><td>Luis Pinto</td><td>Ayer</td><td><span class="bdg ba">En proceso</span></td></tr>
+            <tr><td>#1039</td><td>Rímac Seguros</td><td>Solicitud de devolución</td><td><span class="bdg bp">Comercial</span></td><td><span class="bdg ba">Media</span></td><td>Luis Pinto</td><td>02/04/25</td><td><span class="bdg ba">En proceso</span></td></tr>
+            <tr><td>#1038</td><td>InRetail Perú</td><td>Consulta sobre descuentos</td><td><span class="bdg bp">Comercial</span></td><td><span class="bdg bgr">Baja</span></td><td>Sin asignar</td><td>02/04/25</td><td><span class="bdg bb">Nuevo</span></td></tr>
+            <tr><td>#1036</td><td>Grupo Breca</td><td>Consulta técnica de producto</td><td><span class="bdg bb">Técnico</span></td><td><span class="bdg bgr">Baja</span></td><td>Sin asignar</td><td>02/04/25</td><td><span class="bdg bb">Nuevo</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- SLA -->
+    <div id="view-sla" class="hidden">
+      <div class="sec">
+        <div class="sh"><span class="st">Acuerdos de nivel de servicio (SLA)</span></div>
+        <table>
+          <thead><tr><th>Nivel SLA</th><th>Segmento</th><th>1ra respuesta</th><th>Resolución</th><th>Cumplimiento mes</th><th>Tickets afectados</th><th>Estado</th></tr></thead>
+          <tbody>
+            <tr><td>SLA Crítico</td><td>Enterprise</td><td>1 hora</td><td>4 horas</td><td>92%</td><td>1 incumplido</td><td><span class="bdg bg">OK</span></td></tr>
+            <tr><td>SLA Alto</td><td>Enterprise / Mid</td><td>2 horas</td><td>8 horas</td><td>96%</td><td>0 incumplidos</td><td><span class="bdg bg">OK</span></td></tr>
+            <tr><td>SLA Medio</td><td>Mid-market</td><td>4 horas</td><td>24 horas</td><td>88%</td><td>3 incumplidos</td><td><span class="bdg ba">Alerta</span></td></tr>
+            <tr><td>SLA Estándar</td><td>SMB</td><td>8 horas</td><td>48 horas</td><td>98%</td><td>0 incumplidos</td><td><span class="bdg bg">OK</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- KB -->
+    <div id="view-kb" class="hidden">
+      <div class="sec">
+        <div class="sh"><span class="st">Base de conocimiento</span><span class="sb">42 artículos</span></div>
+        <table>
+          <thead><tr><th>Artículo</th><th>Categoría</th><th>Autor</th><th>Vistas</th><th>Útil</th><th>Últ. actualización</th><th>Estado</th></tr></thead>
+          <tbody>
+            <tr><td>Cómo realizar una devolución</td><td><span class="bdg bp">Comercial</span></td><td>Ana Torres</td><td>284</td><td>94%</td><td>15/03/25</td><td><span class="bdg bg">Publicado</span></td></tr>
+            <tr><td>Guía de acceso al portal de clientes</td><td><span class="bdg bb">Técnico</span></td><td>Carlos Q.</td><td>412</td><td>88%</td><td>10/03/25</td><td><span class="bdg bg">Publicado</span></td></tr>
+            <tr><td>Proceso de facturación electrónica</td><td><span class="bdg ba">Billing</span></td><td>Luis Pinto</td><td>198</td><td>91%</td><td>05/03/25</td><td><span class="bdg bg">Publicado</span></td></tr>
+            <tr><td>Política de descuentos por volumen</td><td><span class="bdg bp">Comercial</span></td><td>Carlos Q.</td><td>156</td><td>79%</td><td>01/03/25</td><td><span class="bdg bg">Publicado</span></td></tr>
+            <tr><td>Actualización de datos RUC</td><td><span class="bdg bb">Técnico</span></td><td>Ana Torres</td><td>88</td><td>82%</td><td>20/02/25</td><td><span class="bdg ba">En revisión</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- NPS -->
+    <div id="view-nps" class="hidden">
+      <div class="kpi3">
+        <div class="kpi"><div class="kl">NPS general</div><div class="kv">72</div><div class="kd up">Promotores 78% · Detractores 6%</div></div>
+        <div class="kpi"><div class="kl">CSAT promedio</div><div class="kv">4.4 / 5</div><div class="kd up">▲ 0.2 vs trimestre ant.</div></div>
+        <div class="kpi"><div class="kl">Encuestas respondidas</div><div class="kv">126</div><div class="kd nu">Tasa respuesta: 61%</div></div>
+      </div>
+      <div class="sec">
+        <div class="sh"><span class="st">Últimas evaluaciones de clientes</span></div>
+        <table>
+          <thead><tr><th>Cliente</th><th>Fecha</th><th>NPS</th><th>CSAT</th><th>Comentario</th><th>Categoría</th></tr></thead>
+          <tbody>
+            <tr><td>Rímac Seguros</td><td>31/03/25</td><td><span class="bdg bg">9 — Promotor</span></td><td><span class="star">★★★★★</span> 5.0</td><td>"Excelente atención del equipo"</td><td><span class="bdg bg">Promotor</span></td></tr>
+            <tr><td>Anglo Americana</td><td>30/03/25</td><td><span class="bdg bg">8 — Promotor</span></td><td><span class="star">★★★★</span> 4.0</td><td>"Buen servicio, tiempos ok"</td><td><span class="bdg bg">Promotor</span></td></tr>
+            <tr><td>Supermercados Peru</td><td>28/03/25</td><td><span class="bdg ba">7 — Neutro</span></td><td><span class="star">★★★★</span> 4.0</td><td>"Mejorar velocidad de respuesta"</td><td><span class="bdg ba">Neutro</span></td></tr>
+            <tr><td>Ferreyros SAC</td><td>20/03/25</td><td><span class="bdg br">4 — Detractor</span></td><td><span class="star">★★</span> 2.0</td><td>"Demora en resolver incidencias"</td><td><span class="bdg br">Detractor</span></td></tr>
+            <tr><td>Alicorp S.A.A.</td><td>18/03/25</td><td><span class="bdg bg">9 — Promotor</span></td><td><span class="star">★★★★★</span> 5.0</td><td>"Muy profesionales"</td><td><span class="bdg bg">Promotor</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- CAMPAÑAS -->
+    <div id="view-campanas" class="hidden">
+      <div class="sec">
+        <div class="sh"><span class="st">Campañas de marketing</span><span class="sb">5 activas</span></div>
+        <table>
+          <thead><tr><th>Campaña</th><th>Canal</th><th>Inicio</th><th>Fin</th><th>Leads generados</th><th>Costo</th><th>Conversión</th><th>Estado</th></tr></thead>
+          <tbody>
+            <tr><td>Campaña verano 2025</td><td><span class="bdg bb">Email</span></td><td>01/03/25</td><td>31/03/25</td><td>142</td><td>S/ 2,400</td><td>8.4%</td><td><span class="bdg bg">Finalizada</span></td></tr>
+            <tr><td>Descuentos Q2 — Enterprise</td><td><span class="bdg bp">Directo</span></td><td>01/04/25</td><td>30/04/25</td><td>24</td><td>S/ 1,800</td><td>—</td><td><span class="bdg ba">Activa</span></td></tr>
+            <tr><td>Webinar productos nuevos</td><td><span class="bdg bpu">Digital</span></td><td>15/04/25</td><td>15/04/25</td><td>0</td><td>S/ 600</td><td>—</td><td><span class="bdg bb">Programada</span></td></tr>
+            <tr><td>Reactivación clientes inactivos</td><td><span class="bdg bb">Email</span></td><td>01/04/25</td><td>15/04/25</td><td>8</td><td>S/ 400</td><td>12.5%</td><td><span class="bdg ba">Activa</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- LEADS -->
+    <div id="view-leads" class="hidden">
+      <div class="kpi3">
+        <div class="kpi"><div class="kl">Leads nuevos</div><div class="kv">58</div><div class="kd up">▲ 14 vs mes ant.</div></div>
+        <div class="kpi"><div class="kl">Leads calificados (MQL)</div><div class="kv">22</div><div class="kd up">38% del total</div></div>
+        <div class="kpi"><div class="kl">Tasa conversión lead→oport.</div><div class="kv">18.9%</div><div class="kd up">▲ 2pp</div></div>
+      </div>
+      <div class="sec">
+        <div class="sh"><span class="st">Registro de leads</span></div>
+        <table>
+          <thead><tr><th>Lead</th><th>Empresa</th><th>Fuente</th><th>Email</th><th>Score</th><th>Asignado a</th><th>Estado</th></tr></thead>
+          <tbody>
+            <tr><td>Sandra Medina</td><td>Financiera Oh! SAC</td><td><span class="bdg bb">Web</span></td><td>s.medina@oh.pe</td><td><span class="bdg bg">85 — Hot</span></td><td>Carlos Q.</td><td><span class="bdg bg">Calificado</span></td></tr>
+            <tr><td>Marco Ríos</td><td>Plaza Vea</td><td><span class="bdg bpu">Webinar</span></td><td>m.rios@plazavea.pe</td><td><span class="bdg bg">78 — Hot</span></td><td>Ana T.</td><td><span class="bdg bg">Calificado</span></td></tr>
+            <tr><td>Lucía Castro</td><td>Caja Piura</td><td><span class="bdg bb">Email</span></td><td>l.castro@cajapiura.pe</td><td><span class="bdg ba">52 — Warm</span></td><td>Luis P.</td><td><span class="bdg ba">En contacto</span></td></tr>
+            <tr><td>David Herrera</td><td>Mibanco SAC</td><td><span class="bdg bp">Referido</span></td><td>d.herrera@mibanco.pe</td><td><span class="bdg ba">48 — Warm</span></td><td>Sin asignar</td><td><span class="bdg bb">Nuevo</span></td></tr>
+            <tr><td>Patricia Loo</td><td>Cassinelli</td><td><span class="bdg bb">Web</span></td><td>p.loo@cassinelli.pe</td><td><span class="bdg bgr">21 — Cold</span></td><td>Sin asignar</td><td><span class="bdg bgr">Sin calificar</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- FORECAST -->
+    <div id="view-forecast" class="hidden">
+      <div class="sec">
+        <div class="sh"><span class="st">Forecast de ventas — Q2 2025</span></div>
+        <table>
+          <thead><tr><th>Mes</th><th>Meta</th><th>Pipeline ponderado</th><th>Mejor caso</th><th>Comprometido</th><th>Cumplimiento est.</th></tr></thead>
+          <tbody>
+            <tr><td>Abril 2025</td><td>S/ 200,000</td><td>S/ 186,000</td><td>S/ 242,000</td><td>S/ 165,200</td><td><span class="bdg ba">93%</span></td></tr>
+            <tr><td>Mayo 2025</td><td>S/ 210,000</td><td>S/ 178,400</td><td>S/ 228,000</td><td>S/ 142,000</td><td><span class="bdg ba">85%</span></td></tr>
+            <tr><td>Junio 2025</td><td>S/ 220,000</td><td>S/ 124,000</td><td>S/ 198,000</td><td>S/ 95,000</td><td><span class="bdg br">56%</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="sec">
+        <div class="sh"><span class="st">Forecast por vendedor — Abril 2025</span></div>
+        <table>
+          <thead><tr><th>Vendedor</th><th>Meta</th><th>Pipeline</th><th>Comprometido</th><th>Probabilidad</th></tr></thead>
+          <tbody>
+            <tr><td>Carlos Quispe</td><td>S/ 80,000</td><td>S/ 420,000</td><td>S/ 72,000</td><td><span class="bdg bg">90%</span></td></tr>
+            <tr><td>Ana Torres</td><td>S/ 75,000</td><td>S/ 380,000</td><td>S/ 62,000</td><td><span class="bdg ba">83%</span></td></tr>
+            <tr><td>Luis Pinto</td><td>S/ 55,000</td><td>S/ 210,000</td><td>S/ 31,200</td><td><span class="bdg br">57%</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ACTIVIDADES -->
+    <div id="view-actividades" class="hidden">
+      <div class="sec">
+        <div class="sh"><span class="st">Actividades del equipo comercial</span><span class="sb">Hoy — 4 Abr 2025</span></div>
+        <table>
+          <thead><tr><th>Hora</th><th>Tipo</th><th>Descripción</th><th>Cliente / Contacto</th><th>Vendedor</th><th>Oportunidad</th><th>Estado</th></tr></thead>
+          <tbody>
+            <tr><td>09:00</td><td><span class="bdg bb">Llamada</span></td><td>Seguimiento cotización COT-088</td><td>Jorge Ramírez — Rímac</td><td>Carlos Q.</td><td>Renovación anual</td><td><span class="bdg bg">Completada</span></td></tr>
+            <tr><td>10:30</td><td><span class="bdg bpu">Reunión</span></td><td>Demo de producto — sala virtual</td><td>Carmen García — Breca</td><td>Carlos Q.</td><td>Nuevo contrato</td><td><span class="bdg ba">En curso</span></td></tr>
+            <tr><td>11:00</td><td><span class="bdg bp">Visita</span></td><td>Visita presencial cliente</td><td>María Llanos — Anglo</td><td>Ana T.</td><td>Expansión premium</td><td><span class="bdg ba">En curso</span></td></tr>
+            <tr><td>14:00</td><td><span class="bdg bb">Email</span></td><td>Envío propuesta técnica</td><td>Roberto Torres — Ferreyros</td><td>Carlos Q.</td><td>—</td><td><span class="bdg bb">Pendiente</span></td></tr>
+            <tr><td>16:00</td><td><span class="bdg bpu">Reunión</span></td><td>Revisión pipeline semanal</td><td>Equipo comercial interno</td><td>Todos</td><td>—</td><td><span class="bdg bb">Pendiente</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</div>
+</div>
+
+<script>
+const P={
+  dashboard:{t:'Dashboard CRM',c:'CRM / Inicio'},
+  pipeline:{t:'Pipeline de ventas',c:'Ventas / Pipeline'},
+  clientes:{t:'Clientes',c:'Ventas / Clientes'},
+  contactos:{t:'Contactos',c:'Ventas / Contactos'},
+  oportunidades:{t:'Oportunidades',c:'Ventas / Oportunidades'},
+  cotizaciones:{t:'Cotizaciones',c:'Ventas / Cotizaciones'},
+  pedidos:{t:'Pedidos de venta',c:'Ventas / Pedidos'},
+  vendedores:{t:'Equipo de ventas',c:'Ventas / Equipo'},
+  comisiones:{t:'Comisiones',c:'Ventas / Comisiones'},
+  tickets:{t:'Tickets y casos',c:'Servicio / Tickets'},
+  sla:{t:'SLA y tiempos de respuesta',c:'Servicio / SLA'},
+  kb:{t:'Base de conocimiento',c:'Servicio / Conocimiento'},
+  nps:{t:'NPS y satisfacción',c:'Servicio / NPS'},
+  campanas:{t:'Campañas de marketing',c:'Marketing / Campañas'},
+  leads:{t:'Gestión de leads',c:'Marketing / Leads'},
+  forecast:{t:'Forecast de ventas',c:'Reportes / Forecast'},
+  actividades:{t:'Actividades comerciales',c:'Reportes / Actividades'}
+};
+let cur='dashboard';
+function nav(el,p){
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('view-'+cur).classList.add('hidden');
+  document.getElementById('view-'+p).classList.remove('hidden');
+  cur=p;
+  document.getElementById('pg-title').textContent=P[p].t;
+  document.getElementById('pg-crumb').textContent=P[p].c;
+}
+</script>

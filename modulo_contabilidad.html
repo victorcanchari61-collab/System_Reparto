@@ -1,0 +1,398 @@
+
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--font-sans); }
+  .app { display: flex; height: 100vh; min-height: 600px; background: var(--color-background-tertiary); }
+  .sidebar { width: 220px; min-width: 220px; background: var(--color-background-primary); border-right: 0.5px solid var(--color-border-tertiary); display: flex; flex-direction: column; padding: 0; overflow-y: auto; }
+  .sidebar-header { padding: 20px 16px 12px; border-bottom: 0.5px solid var(--color-border-tertiary); }
+  .sidebar-logo { font-size: 15px; font-weight: 500; color: var(--color-text-primary); }
+  .sidebar-sub { font-size: 12px; color: var(--color-text-secondary); margin-top: 2px; }
+  .nav-section { padding: 12px 0 4px; }
+  .nav-label { font-size: 10px; font-weight: 500; color: var(--color-text-tertiary); text-transform: uppercase; letter-spacing: 0.08em; padding: 0 16px; margin-bottom: 4px; }
+  .nav-item { display: flex; align-items: center; gap: 10px; padding: 8px 16px; cursor: pointer; font-size: 13px; color: var(--color-text-secondary); border-left: 2px solid transparent; transition: all 0.15s; }
+  .nav-item:hover { background: var(--color-background-secondary); color: var(--color-text-primary); }
+  .nav-item.active { background: #E6F1FB; color: #185FA5; border-left-color: #378ADD; font-weight: 500; }
+  .nav-icon { font-size: 14px; width: 18px; text-align: center; }
+  .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+  .topbar { background: var(--color-background-primary); border-bottom: 0.5px solid var(--color-border-tertiary); padding: 12px 24px; display: flex; align-items: center; justify-content: space-between; }
+  .page-title { font-size: 16px; font-weight: 500; color: var(--color-text-primary); }
+  .page-breadcrumb { font-size: 12px; color: var(--color-text-tertiary); margin-top: 2px; }
+  .topbar-actions { display: flex; gap: 8px; }
+  .btn { padding: 6px 14px; border-radius: var(--border-radius-md); font-size: 13px; cursor: pointer; border: 0.5px solid var(--color-border-secondary); background: var(--color-background-primary); color: var(--color-text-primary); }
+  .btn-primary { background: #185FA5; color: #fff; border-color: #185FA5; }
+  .content { flex: 1; overflow-y: auto; padding: 24px; }
+  .kpi-grid { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 12px; margin-bottom: 24px; }
+  .kpi-card { background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 16px; }
+  .kpi-label { font-size: 12px; color: var(--color-text-secondary); margin-bottom: 6px; }
+  .kpi-value { font-size: 22px; font-weight: 500; color: var(--color-text-primary); }
+  .kpi-delta { font-size: 11px; margin-top: 4px; }
+  .kpi-up { color: #3B6D11; } .kpi-down { color: #A32D2D; }
+  .section { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); margin-bottom: 20px; overflow: hidden; }
+  .section-header { padding: 14px 18px; border-bottom: 0.5px solid var(--color-border-tertiary); display: flex; align-items: center; justify-content: space-between; }
+  .section-title { font-size: 14px; font-weight: 500; color: var(--color-text-primary); }
+  .section-badge { font-size: 11px; padding: 2px 10px; border-radius: 99px; background: var(--color-background-info); color: var(--color-text-info); }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { text-align: left; font-size: 11px; font-weight: 500; color: var(--color-text-tertiary); text-transform: uppercase; letter-spacing: 0.06em; padding: 10px 18px; border-bottom: 0.5px solid var(--color-border-tertiary); }
+  td { padding: 11px 18px; border-bottom: 0.5px solid var(--color-border-tertiary); color: var(--color-text-primary); }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: var(--color-background-secondary); }
+  .badge { display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 99px; }
+  .badge-green { background: #EAF3DE; color: #3B6D11; }
+  .badge-amber { background: #FAEEDA; color: #854F0B; }
+  .badge-red { background: #FCEBEB; color: #A32D2D; }
+  .badge-blue { background: #E6F1FB; color: #185FA5; }
+  .badge-gray { background: #F1EFE8; color: #5F5E5A; }
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+  .chart-bar-wrap { padding: 16px 18px; }
+  .bar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .bar-label { font-size: 12px; color: var(--color-text-secondary); width: 80px; text-align: right; flex-shrink: 0; }
+  .bar-track { flex: 1; height: 8px; background: var(--color-background-secondary); border-radius: 4px; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 4px; }
+  .bar-val { font-size: 12px; color: var(--color-text-primary); width: 70px; font-weight: 500; }
+  .hidden { display: none; }
+</style>
+
+<div class="app">
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo">ContaCloud</div>
+      <div class="sidebar-sub">Módulo Contabilidad</div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Principal</div>
+      <div class="nav-item active" onclick="nav(this,'dashboard')"><span class="nav-icon">◼</span> Dashboard</div>
+      <div class="nav-item" onclick="nav(this,'asientos')"><span class="nav-icon">✎</span> Asientos</div>
+      <div class="nav-item" onclick="nav(this,'cuentas')"><span class="nav-icon">☰</span> Plan de Cuentas</div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Informes</div>
+      <div class="nav-item" onclick="nav(this,'balance')"><span class="nav-icon">▤</span> Balance General</div>
+      <div class="nav-item" onclick="nav(this,'resultados')"><span class="nav-icon">▦</span> Estado de Resultados</div>
+      <div class="nav-item" onclick="nav(this,'flujo')"><span class="nav-icon">⇄</span> Flujo de Caja</div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Operaciones</div>
+      <div class="nav-item" onclick="nav(this,'facturas')"><span class="nav-icon">◧</span> Facturas</div>
+      <div class="nav-item" onclick="nav(this,'pagos')"><span class="nav-icon">●</span> Pagos y Cobros</div>
+      <div class="nav-item" onclick="nav(this,'bancos')"><span class="nav-icon">◈</span> Bancos</div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Config</div>
+      <div class="nav-item" onclick="nav(this,'impuestos')"><span class="nav-icon">◑</span> Impuestos</div>
+      <div class="nav-item" onclick="nav(this,'periodos')"><span class="nav-icon">▷</span> Períodos</div>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="topbar">
+      <div>
+        <div class="page-title" id="page-title">Dashboard</div>
+        <div class="page-breadcrumb" id="page-breadcrumb">Contabilidad / Inicio</div>
+      </div>
+      <div class="topbar-actions">
+        <button class="btn">Exportar</button>
+        <button class="btn btn-primary">+ Nuevo</button>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- DASHBOARD -->
+      <div id="view-dashboard">
+        <div class="kpi-grid">
+          <div class="kpi-card"><div class="kpi-label">Ingresos del mes</div><div class="kpi-value">S/ 184,320</div><div class="kpi-delta kpi-up">▲ 12.4% vs mes ant.</div></div>
+          <div class="kpi-card"><div class="kpi-label">Gastos del mes</div><div class="kpi-value">S/ 112,890</div><div class="kpi-delta kpi-down">▲ 4.1% vs mes ant.</div></div>
+          <div class="kpi-card"><div class="kpi-label">Utilidad neta</div><div class="kpi-value">S/ 71,430</div><div class="kpi-delta kpi-up">▲ 18.7% vs mes ant.</div></div>
+          <div class="kpi-card"><div class="kpi-label">Cuentas por cobrar</div><div class="kpi-value">S/ 43,800</div><div class="kpi-delta kpi-down">▼ 2.3% vs mes ant.</div></div>
+        </div>
+        <div class="two-col">
+          <div class="section">
+            <div class="section-header"><span class="section-title">Ingresos por área</span><span class="section-badge">Marzo 2025</span></div>
+            <div class="chart-bar-wrap">
+              <div class="bar-row"><div class="bar-label">Ventas</div><div class="bar-track"><div class="bar-fill" style="width:88%;background:#378ADD;"></div></div><div class="bar-val">S/ 98,400</div></div>
+              <div class="bar-row"><div class="bar-label">Servicios</div><div class="bar-track"><div class="bar-fill" style="width:55%;background:#1D9E75;"></div></div><div class="bar-val">S/ 52,100</div></div>
+              <div class="bar-row"><div class="bar-label">Intereses</div><div class="bar-track"><div class="bar-fill" style="width:20%;background:#EF9F27;"></div></div><div class="bar-val">S/ 18,720</div></div>
+              <div class="bar-row"><div class="bar-label">Otros</div><div class="bar-track"><div class="bar-fill" style="width:14%;background:#888780;"></div></div><div class="bar-val">S/ 15,100</div></div>
+            </div>
+          </div>
+          <div class="section">
+            <div class="section-header"><span class="section-title">Últimos asientos</span></div>
+            <table>
+              <thead><tr><th>Fecha</th><th>Descripción</th><th>Monto</th></tr></thead>
+              <tbody>
+                <tr><td>31/03</td><td>Venta al contado - Cliente Rímac</td><td>S/ 8,400</td></tr>
+                <tr><td>30/03</td><td>Pago proveedor Textiles Andinos</td><td>S/ 3,200</td></tr>
+                <tr><td>29/03</td><td>Depreciación equipo cómputo</td><td>S/ 520</td></tr>
+                <tr><td>28/03</td><td>Cobro servicio consultoría</td><td>S/ 6,750</td></tr>
+                <tr><td>27/03</td><td>Pago planilla empleados</td><td>S/ 24,800</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ASIENTOS -->
+      <div id="view-asientos" class="hidden">
+        <div class="section">
+          <div class="section-header"><span class="section-title">Libro de asientos contables</span><span class="section-badge">48 registros</span></div>
+          <table>
+            <thead><tr><th>N°</th><th>Fecha</th><th>Cuenta Débito</th><th>Cuenta Crédito</th><th>Descripción</th><th>Debe</th><th>Haber</th><th>Estado</th></tr></thead>
+            <tbody>
+              <tr><td>001</td><td>01/03/25</td><td>101 - Caja</td><td>401 - Ventas</td><td>Venta contado fact. 001</td><td>S/ 12,000</td><td>S/ 12,000</td><td><span class="badge badge-green">Aprobado</span></td></tr>
+              <tr><td>002</td><td>03/03/25</td><td>121 - CxC</td><td>401 - Ventas</td><td>Venta crédito fact. 002</td><td>S/ 8,500</td><td>S/ 8,500</td><td><span class="badge badge-green">Aprobado</span></td></tr>
+              <tr><td>003</td><td>05/03/25</td><td>601 - Comp. Mercan.</td><td>201 - Proveedores</td><td>Compra mercadería OC-44</td><td>S/ 4,200</td><td>S/ 4,200</td><td><span class="badge badge-green">Aprobado</span></td></tr>
+              <tr><td>004</td><td>08/03/25</td><td>612 - Gasto sueldos</td><td>411 - Remuneraciones</td><td>Provisión planilla marzo</td><td>S/ 24,800</td><td>S/ 24,800</td><td><span class="badge badge-amber">Pendiente</span></td></tr>
+              <tr><td>005</td><td>10/03/25</td><td>659 - Depreciación</td><td>391 - Dep. Acum.</td><td>Dep. vehículo mar-2025</td><td>S/ 1,400</td><td>S/ 1,400</td><td><span class="badge badge-green">Aprobado</span></td></tr>
+              <tr><td>006</td><td>12/03/25</td><td>201 - Proveedores</td><td>104 - Banco BCP</td><td>Pago proveedor Textiles</td><td>S/ 3,200</td><td>S/ 3,200</td><td><span class="badge badge-green">Aprobado</span></td></tr>
+              <tr><td>007</td><td>15/03/25</td><td>673 - Gasto financiero</td><td>451 - Préstamo BCP</td><td>Interés préstamo marzo</td><td>S/ 980</td><td>S/ 980</td><td><span class="badge badge-red">Revisión</span></td></tr>
+              <tr><td>008</td><td>20/03/25</td><td>104 - Banco BCP</td><td>121 - CxC</td><td>Cobro fact. 002 cliente</td><td>S/ 8,500</td><td>S/ 8,500</td><td><span class="badge badge-green">Aprobado</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- PLAN DE CUENTAS -->
+      <div id="view-cuentas" class="hidden">
+        <div class="section">
+          <div class="section-header"><span class="section-title">Plan de cuentas</span><span class="section-badge">32 cuentas activas</span></div>
+          <table>
+            <thead><tr><th>Código</th><th>Nombre</th><th>Tipo</th><th>Nivel</th><th>Saldo actual</th><th>Estado</th></tr></thead>
+            <tbody>
+              <tr><td>101</td><td>Caja</td><td>Activo</td><td>Detalle</td><td>S/ 18,400</td><td><span class="badge badge-green">Activa</span></td></tr>
+              <tr><td>104</td><td>Banco BCP - Cta. Cte.</td><td>Activo</td><td>Detalle</td><td>S/ 92,350</td><td><span class="badge badge-green">Activa</span></td></tr>
+              <tr><td>121</td><td>Cuentas por cobrar</td><td>Activo</td><td>Detalle</td><td>S/ 43,800</td><td><span class="badge badge-green">Activa</span></td></tr>
+              <tr><td>151</td><td>Inventario de mercaderías</td><td>Activo</td><td>Detalle</td><td>S/ 67,200</td><td><span class="badge badge-green">Activa</span></td></tr>
+              <tr><td>331</td><td>Equipo de cómputo</td><td>Activo fijo</td><td>Detalle</td><td>S/ 28,000</td><td><span class="badge badge-green">Activa</span></td></tr>
+              <tr><td>201</td><td>Proveedores</td><td>Pasivo</td><td>Detalle</td><td>S/ 21,400</td><td><span class="badge badge-green">Activa</span></td></tr>
+              <tr><td>411</td><td>Remuneraciones por pagar</td><td>Pasivo</td><td>Detalle</td><td>S/ 24,800</td><td><span class="badge badge-amber">Pendiente</span></td></tr>
+              <tr><td>451</td><td>Préstamo BCP largo plazo</td><td>Pasivo</td><td>Detalle</td><td>S/ 85,000</td><td><span class="badge badge-green">Activa</span></td></tr>
+              <tr><td>501</td><td>Capital social</td><td>Patrimonio</td><td>Detalle</td><td>S/ 120,000</td><td><span class="badge badge-green">Activa</span></td></tr>
+              <tr><td>401</td><td>Ventas</td><td>Ingreso</td><td>Detalle</td><td>S/ 184,320</td><td><span class="badge badge-green">Activa</span></td></tr>
+              <tr><td>601</td><td>Compras de mercadería</td><td>Gasto</td><td>Detalle</td><td>S/ 68,400</td><td><span class="badge badge-green">Activa</span></td></tr>
+              <tr><td>612</td><td>Gasto de personal</td><td>Gasto</td><td>Detalle</td><td>S/ 24,800</td><td><span class="badge badge-green">Activa</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- BALANCE GENERAL -->
+      <div id="view-balance" class="hidden">
+        <div class="two-col">
+          <div class="section">
+            <div class="section-header"><span class="section-title">Activos</span></div>
+            <table>
+              <thead><tr><th>Cuenta</th><th>Importe</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Activo Corriente</strong></td><td></td></tr>
+                <tr><td style="padding-left:30px">Caja y bancos</td><td>S/ 110,750</td></tr>
+                <tr><td style="padding-left:30px">Cuentas por cobrar</td><td>S/ 43,800</td></tr>
+                <tr><td style="padding-left:30px">Inventarios</td><td>S/ 67,200</td></tr>
+                <tr><td style="padding-left:30px">Gastos prepagados</td><td>S/ 3,200</td></tr>
+                <tr><td><strong>Total Activo Corriente</strong></td><td><strong>S/ 224,950</strong></td></tr>
+                <tr><td><strong>Activo No Corriente</strong></td><td></td></tr>
+                <tr><td style="padding-left:30px">Inmuebles y equipos</td><td>S/ 95,000</td></tr>
+                <tr><td style="padding-left:30px">Dep. acumulada</td><td>(S/ 14,200)</td></tr>
+                <tr><td><strong>Total Activo No Corriente</strong></td><td><strong>S/ 80,800</strong></td></tr>
+                <tr><td><strong>TOTAL ACTIVO</strong></td><td><strong>S/ 305,750</strong></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="section">
+            <div class="section-header"><span class="section-title">Pasivos y Patrimonio</span></div>
+            <table>
+              <thead><tr><th>Cuenta</th><th>Importe</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Pasivo Corriente</strong></td><td></td></tr>
+                <tr><td style="padding-left:30px">Proveedores</td><td>S/ 21,400</td></tr>
+                <tr><td style="padding-left:30px">Remuneraciones</td><td>S/ 24,800</td></tr>
+                <tr><td style="padding-left:30px">Tributos por pagar</td><td>S/ 8,900</td></tr>
+                <tr><td><strong>Total Pasivo Corriente</strong></td><td><strong>S/ 55,100</strong></td></tr>
+                <tr><td><strong>Pasivo No Corriente</strong></td><td></td></tr>
+                <tr><td style="padding-left:30px">Préstamo BCP L/P</td><td>S/ 85,000</td></tr>
+                <tr><td><strong>Total Pasivo No Corriente</strong></td><td><strong>S/ 85,000</strong></td></tr>
+                <tr><td><strong>Patrimonio</strong></td><td></td></tr>
+                <tr><td style="padding-left:30px">Capital social</td><td>S/ 120,000</td></tr>
+                <tr><td style="padding-left:30px">Utilidades retenidas</td><td>S/ 45,650</td></tr>
+                <tr><td><strong>TOTAL PASIVO + PATRIM.</strong></td><td><strong>S/ 305,750</strong></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ESTADO DE RESULTADOS -->
+      <div id="view-resultados" class="hidden">
+        <div class="section">
+          <div class="section-header"><span class="section-title">Estado de resultados — Marzo 2025</span></div>
+          <table>
+            <thead><tr><th>Concepto</th><th>Importe</th><th>% Ingreso</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Ingresos</strong></td><td></td><td></td></tr>
+              <tr><td style="padding-left:24px">Ventas netas</td><td>S/ 150,500</td><td>81.7%</td></tr>
+              <tr><td style="padding-left:24px">Ingresos por servicios</td><td>S/ 33,820</td><td>18.3%</td></tr>
+              <tr><td><strong>Total ingresos</strong></td><td><strong>S/ 184,320</strong></td><td><strong>100%</strong></td></tr>
+              <tr><td><strong>Costos</strong></td><td></td><td></td></tr>
+              <tr><td style="padding-left:24px">Costo de ventas</td><td>(S/ 68,400)</td><td>37.1%</td></tr>
+              <tr><td><strong>Utilidad bruta</strong></td><td><strong>S/ 115,920</strong></td><td><strong>62.9%</strong></td></tr>
+              <tr><td><strong>Gastos operativos</strong></td><td></td><td></td></tr>
+              <tr><td style="padding-left:24px">Gastos de personal</td><td>(S/ 24,800)</td><td>13.5%</td></tr>
+              <tr><td style="padding-left:24px">Gastos administrativos</td><td>(S/ 8,450)</td><td>4.6%</td></tr>
+              <tr><td style="padding-left:24px">Depreciación</td><td>(S/ 1,400)</td><td>0.8%</td></tr>
+              <tr><td><strong>Utilidad operativa (EBIT)</strong></td><td><strong>S/ 81,270</strong></td><td><strong>44.1%</strong></td></tr>
+              <tr><td style="padding-left:24px">Gastos financieros</td><td>(S/ 980)</td><td>0.5%</td></tr>
+              <tr><td><strong>Utilidad antes de impuestos</strong></td><td><strong>S/ 80,290</strong></td><td><strong>43.6%</strong></td></tr>
+              <tr><td style="padding-left:24px">Impuesto a la renta (29.5%)</td><td>(S/ 23,686)</td><td>12.9%</td></tr>
+              <tr><td style="background:var(--color-background-secondary);"><strong>UTILIDAD NETA</strong></td><td style="background:var(--color-background-secondary);"><strong>S/ 56,604</strong></td><td style="background:var(--color-background-secondary);"><strong>30.7%</strong></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- FLUJO DE CAJA -->
+      <div id="view-flujo" class="hidden">
+        <div class="section">
+          <div class="section-header"><span class="section-title">Flujo de caja — Marzo 2025</span></div>
+          <table>
+            <thead><tr><th>Concepto</th><th>Entradas</th><th>Salidas</th><th>Neto</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Actividades operativas</strong></td><td></td><td></td><td></td></tr>
+              <tr><td style="padding-left:24px">Cobro a clientes</td><td>S/ 158,320</td><td>—</td><td></td></tr>
+              <tr><td style="padding-left:24px">Pago a proveedores</td><td>—</td><td>(S/ 42,600)</td><td></td></tr>
+              <tr><td style="padding-left:24px">Pago planilla</td><td>—</td><td>(S/ 24,800)</td><td></td></tr>
+              <tr><td style="padding-left:24px">Pago tributos</td><td>—</td><td>(S/ 8,900)</td><td></td></tr>
+              <tr><td><strong>Flujo operativo neto</strong></td><td></td><td></td><td><strong>S/ 82,020</strong></td></tr>
+              <tr><td><strong>Actividades de inversión</strong></td><td></td><td></td><td></td></tr>
+              <tr><td style="padding-left:24px">Compra de equipos</td><td>—</td><td>(S/ 12,000)</td><td></td></tr>
+              <tr><td><strong>Flujo de inversión neto</strong></td><td></td><td></td><td><strong>(S/ 12,000)</strong></td></tr>
+              <tr><td><strong>Actividades financieras</strong></td><td></td><td></td><td></td></tr>
+              <tr><td style="padding-left:24px">Pago de préstamo</td><td>—</td><td>(S/ 5,000)</td><td></td></tr>
+              <tr><td style="padding-left:24px">Pago de intereses</td><td>—</td><td>(S/ 980)</td><td></td></tr>
+              <tr><td><strong>Flujo financiero neto</strong></td><td></td><td></td><td><strong>(S/ 5,980)</strong></td></tr>
+              <tr><td style="background:var(--color-background-secondary);"><strong>VARIACIÓN NETA DE CAJA</strong></td><td style="background:var(--color-background-secondary);"></td><td style="background:var(--color-background-secondary);"></td><td style="background:var(--color-background-secondary);"><strong>S/ 64,040</strong></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- FACTURAS -->
+      <div id="view-facturas" class="hidden">
+        <div class="section">
+          <div class="section-header"><span class="section-title">Registro de facturas</span><span class="section-badge">12 este mes</span></div>
+          <table>
+            <thead><tr><th>N° Factura</th><th>Cliente / Proveedor</th><th>Tipo</th><th>Fecha</th><th>Vencimiento</th><th>Monto</th><th>Estado</th></tr></thead>
+            <tbody>
+              <tr><td>F001-00234</td><td>Rímac Seguros S.A.</td><td><span class="badge badge-blue">Emitida</span></td><td>05/03/25</td><td>05/04/25</td><td>S/ 18,400</td><td><span class="badge badge-green">Cobrada</span></td></tr>
+              <tr><td>F001-00235</td><td>Supermercados Peruanos</td><td><span class="badge badge-blue">Emitida</span></td><td>08/03/25</td><td>08/04/25</td><td>S/ 12,750</td><td><span class="badge badge-amber">Pendiente</span></td></tr>
+              <tr><td>F001-00236</td><td>Grupo Breca S.A.C.</td><td><span class="badge badge-blue">Emitida</span></td><td>12/03/25</td><td>12/04/25</td><td>S/ 9,300</td><td><span class="badge badge-amber">Pendiente</span></td></tr>
+              <tr><td>E001-00089</td><td>Textiles Andinos SAC</td><td><span class="badge badge-gray">Recibida</span></td><td>03/03/25</td><td>03/04/25</td><td>S/ 4,200</td><td><span class="badge badge-green">Pagada</span></td></tr>
+              <tr><td>E001-00090</td><td>Computec Perú S.A.</td><td><span class="badge badge-gray">Recibida</span></td><td>10/03/25</td><td>10/04/25</td><td>S/ 12,000</td><td><span class="badge badge-red">Vencida</span></td></tr>
+              <tr><td>F001-00237</td><td>Clínica Anglo Americana</td><td><span class="badge badge-blue">Emitida</span></td><td>18/03/25</td><td>18/04/25</td><td>S/ 22,100</td><td><span class="badge badge-green">Cobrada</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- PAGOS Y COBROS -->
+      <div id="view-pagos" class="hidden">
+        <div class="section">
+          <div class="section-header"><span class="section-title">Pagos y cobros registrados</span></div>
+          <table>
+            <thead><tr><th>Fecha</th><th>Tipo</th><th>Contraparte</th><th>Método</th><th>Monto</th><th>Referencia</th></tr></thead>
+            <tbody>
+              <tr><td>02/03/25</td><td><span class="badge badge-green">Cobro</span></td><td>Rímac Seguros S.A.</td><td>Transferencia</td><td>S/ 18,400</td><td>TRF-BCP-2301</td></tr>
+              <tr><td>05/03/25</td><td><span class="badge badge-red">Pago</span></td><td>Textiles Andinos SAC</td><td>Cheque</td><td>S/ 3,200</td><td>CHQ-00441</td></tr>
+              <tr><td>10/03/25</td><td><span class="badge badge-green">Cobro</span></td><td>Clínica Anglo Americana</td><td>Transferencia</td><td>S/ 22,100</td><td>TRF-BCP-2302</td></tr>
+              <tr><td>15/03/25</td><td><span class="badge badge-red">Pago</span></td><td>Planilla empleados</td><td>Débito cta.</td><td>S/ 24,800</td><td>PLN-MAR25</td></tr>
+              <tr><td>20/03/25</td><td><span class="badge badge-red">Pago</span></td><td>SUNAT - IGV</td><td>Débito SUNAT</td><td>S/ 8,900</td><td>SUB-0320</td></tr>
+              <tr><td>28/03/25</td><td><span class="badge badge-red">Pago</span></td><td>BCP - Cuota préstamo</td><td>Débito cta.</td><td>S/ 5,980</td><td>PRE-0329</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- BANCOS -->
+      <div id="view-bancos" class="hidden">
+        <div class="kpi-grid" style="grid-template-columns:repeat(3,minmax(0,1fr))">
+          <div class="kpi-card"><div class="kpi-label">BCP - Cuenta corriente</div><div class="kpi-value">S/ 92,350</div><div class="kpi-delta kpi-up">Activa</div></div>
+          <div class="kpi-card"><div class="kpi-label">Scotiabank - Ahorros</div><div class="kpi-value">S/ 18,400</div><div class="kpi-delta kpi-up">Activa</div></div>
+          <div class="kpi-card"><div class="kpi-label">Caja chica</div><div class="kpi-value">S/ 18,400</div><div class="kpi-delta kpi-up">Activa</div></div>
+        </div>
+        <div class="section">
+          <div class="section-header"><span class="section-title">Movimientos bancarios — BCP</span><span class="section-badge">Marzo 2025</span></div>
+          <table>
+            <thead><tr><th>Fecha</th><th>Descripción</th><th>Débito</th><th>Crédito</th><th>Saldo</th></tr></thead>
+            <tbody>
+              <tr><td>01/03</td><td>Saldo inicial</td><td>—</td><td>—</td><td>S/ 88,120</td></tr>
+              <tr><td>02/03</td><td>Cobro Rímac Seguros</td><td>—</td><td>S/ 18,400</td><td>S/ 106,520</td></tr>
+              <tr><td>05/03</td><td>Pago Textiles Andinos</td><td>S/ 3,200</td><td>—</td><td>S/ 103,320</td></tr>
+              <tr><td>10/03</td><td>Cobro Clínica Anglo</td><td>—</td><td>S/ 22,100</td><td>S/ 125,420</td></tr>
+              <tr><td>15/03</td><td>Pago planilla</td><td>S/ 24,800</td><td>—</td><td>S/ 100,620</td></tr>
+              <tr><td>20/03</td><td>Pago SUNAT IGV</td><td>S/ 8,900</td><td>—</td><td>S/ 91,720</td></tr>
+              <tr><td>31/03</td><td>Saldo final</td><td>—</td><td>—</td><td><strong>S/ 92,350</strong></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- IMPUESTOS -->
+      <div id="view-impuestos" class="hidden">
+        <div class="section">
+          <div class="section-header"><span class="section-title">Gestión de impuestos</span><span class="section-badge">Perú - SUNAT</span></div>
+          <table>
+            <thead><tr><th>Tributo</th><th>Base imponible</th><th>Tasa</th><th>Monto</th><th>Vencimiento</th><th>Estado</th></tr></thead>
+            <tbody>
+              <tr><td>IGV</td><td>S/ 49,459</td><td>18%</td><td>S/ 8,900</td><td>20/04/25</td><td><span class="badge badge-amber">Por pagar</span></td></tr>
+              <tr><td>Renta 3ra cat. (pago a cta.)</td><td>S/ 184,320</td><td>1.5%</td><td>S/ 2,765</td><td>20/04/25</td><td><span class="badge badge-amber">Por pagar</span></td></tr>
+              <tr><td>ESSALUD</td><td>S/ 24,800</td><td>9%</td><td>S/ 2,232</td><td>20/04/25</td><td><span class="badge badge-green">Pagado</span></td></tr>
+              <tr><td>ONP</td><td>S/ 24,800</td><td>13%</td><td>S/ 3,224</td><td>20/04/25</td><td><span class="badge badge-green">Pagado</span></td></tr>
+              <tr><td>IGV (feb-25)</td><td>S/ 44,200</td><td>18%</td><td>S/ 7,956</td><td>20/03/25</td><td><span class="badge badge-green">Pagado</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- PERIODOS -->
+      <div id="view-periodos" class="hidden">
+        <div class="section">
+          <div class="section-header"><span class="section-title">Períodos contables</span></div>
+          <table>
+            <thead><tr><th>Período</th><th>Desde</th><th>Hasta</th><th>Asientos</th><th>Estado</th><th>Cierre</th></tr></thead>
+            <tbody>
+              <tr><td>Enero 2025</td><td>01/01/25</td><td>31/01/25</td><td>44</td><td><span class="badge badge-gray">Cerrado</span></td><td>05/02/25</td></tr>
+              <tr><td>Febrero 2025</td><td>01/02/25</td><td>28/02/25</td><td>38</td><td><span class="badge badge-gray">Cerrado</span></td><td>07/03/25</td></tr>
+              <tr><td>Marzo 2025</td><td>01/03/25</td><td>31/03/25</td><td>48</td><td><span class="badge badge-green">Activo</span></td><td>—</td></tr>
+              <tr><td>Abril 2025</td><td>01/04/25</td><td>30/04/25</td><td>0</td><td><span class="badge badge-blue">Futuro</span></td><td>—</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+const pages = {
+  dashboard:   { title: 'Dashboard',             breadcrumb: 'Contabilidad / Inicio' },
+  asientos:    { title: 'Libro de Asientos',      breadcrumb: 'Contabilidad / Asientos' },
+  cuentas:     { title: 'Plan de Cuentas',        breadcrumb: 'Contabilidad / Cuentas' },
+  balance:     { title: 'Balance General',        breadcrumb: 'Informes / Balance' },
+  resultados:  { title: 'Estado de Resultados',   breadcrumb: 'Informes / Resultados' },
+  flujo:       { title: 'Flujo de Caja',          breadcrumb: 'Informes / Flujo' },
+  facturas:    { title: 'Facturas',               breadcrumb: 'Operaciones / Facturas' },
+  pagos:       { title: 'Pagos y Cobros',         breadcrumb: 'Operaciones / Pagos' },
+  bancos:      { title: 'Bancos',                 breadcrumb: 'Operaciones / Bancos' },
+  impuestos:   { title: 'Impuestos',              breadcrumb: 'Config / Impuestos' },
+  periodos:    { title: 'Períodos Contables',     breadcrumb: 'Config / Períodos' }
+};
+let current = 'dashboard';
+function nav(el, page) {
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('view-' + current).classList.add('hidden');
+  document.getElementById('view-' + page).classList.remove('hidden');
+  current = page;
+  document.getElementById('page-title').textContent = pages[page].title;
+  document.getElementById('page-breadcrumb').textContent = pages[page].breadcrumb;
+}
+</script>

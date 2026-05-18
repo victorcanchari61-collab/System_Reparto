@@ -4,4 +4,5 @@ public sealed record CreateUserRequest(
     string FullName,
     string Email,
     string Phone,
-    string Password);
+    string Password,
+    Guid?  RoleId = null);
